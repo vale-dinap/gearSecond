@@ -1,6 +1,6 @@
 # GearSecond
 
-\*\*Pump up the reasoning: a skill that gears your model up to jet-think.\*\*Faster answers, fewer thinking tokens, lower cost, with the same model at the same effortlevel and the same quality.
+**Pump up the reasoning: a skill that gears your model up to jet-think.** Faster answers, fewer thinking tokens, lower cost, with the same model at the same effortlevel and the same quality.
 
 GearSecond changes how a model thinks, not how it answers. Thinking becomes short bursts ofkey inferences: no full sentences, no filler, no self-talk, one check and then stop. Thereply keeps whatever style it would have had anyway, including any style you, your projector another skill asked for.
 
