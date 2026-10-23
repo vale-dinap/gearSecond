@@ -1,0 +1,27 @@
+[
+  {
+    "id": "two-sentences",
+    "check": "max_sentences",
+    "limit": 2,
+    "prompt": "In at most two sentences: why does Rust refuse to compile code that holds two mutable references to the same value at the same time, and what bug class does that prevent?"
+  },
+  {
+    "id": "numbered-3",
+    "check": "numbered_items",
+    "limit": 3,
+    "prompt": "My Postgres query `SELECT * FROM orders WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 20` got slow once the table reached 50 million rows. Give me exactly 3 numbered suggestions, one line each, nothing else."
+  },
+  {
+    "id": "compact",
+    "check": "max_articles",
+    "limit": 0.03,
+    "system": "Reply style for this whole session: terse, like a smart caveman. Drop articles (a, an, the), filler, pleasantries and hedging. Fragments fine. Short words. Keep technical terms, code and numbers exact. Apply to every reply.",
+    "prompt": "Why does my Python function `def add(x, items=[]): items.append(x); return items` return [1, 2] on the second call `add(2)` after a first call `add(1)`, and how do I fix it?"
+  },
+  {
+    "id": "default",
+    "check": "normal_prose",
+    "limit": 0.04,
+    "prompt": "A service retries failed HTTP calls immediately, up to 5 times. During an outage of its dependency, that made the outage worse. Explain why, and what retry policy you would use instead."
+  }
+]

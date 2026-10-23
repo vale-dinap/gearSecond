@@ -1,0 +1,22 @@
+[
+  {
+    "id": "stairs",
+    "question": "In how many ways can you climb a staircase of 12 steps if each move climbs either 1 or 2 steps?",
+    "answer": "233"
+  },
+  {
+    "id": "derange",
+    "question": "How many permutations of 1, 2, 3, 4, 5, 6 leave no number in its original position?",
+    "answer": "265"
+  },
+  {
+    "id": "div35",
+    "question": "How many integers from 1 to 1000 are divisible by 3 or by 5, but not by 15?",
+    "answer": "401"
+  },
+  {
+    "id": "digits4",
+    "question": "How many 4-digit positive integers have digits that sum to 10?",
+    "answer": "219"
+  }
+]

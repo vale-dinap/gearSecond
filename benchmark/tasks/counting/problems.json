@@ -1,0 +1,62 @@
+[
+  {
+    "id": "coins",
+    "question": "In how many ways can you make 137 cents using coins of 1, 2, 5, 10, 20 and 50 cents (unlimited supply of each; order does not matter)?",
+    "answer": "14966"
+  },
+  {
+    "id": "indep",
+    "question": "Consider the 3-by-7 grid graph (21 vertices arranged in 3 rows and 7 columns, each vertex joined to its horizontal and vertical neighbours). How many independent sets does it have, counting the empty set? (An independent set is a set of vertices no two of which are adjacent.)",
+    "answer": "10897"
+  },
+  {
+    "id": "rooks",
+    "question": "In how many ways can 8 non-attacking rooks be placed on an 8x8 chessboard so that no rook lies on either of the two main diagonals?",
+    "answer": "4752"
+  },
+  {
+    "id": "abc",
+    "question": "How many strings of length 11 over the alphabet {A, B, C} have no two adjacent equal letters and contain exactly 4 A's?",
+    "answer": "1240"
+  },
+  {
+    "id": "subsets",
+    "question": "How many 5-element subsets of {1, 2, ..., 17} have a sum divisible by 7?",
+    "answer": "884"
+  },
+  {
+    "id": "saw",
+    "question": "How many 8-step self-avoiding walks on the square lattice start at the origin and end at a point on the x-axis (y = 0)? Walks are sequences of unit steps N/S/E/W that never revisit a point; different sequences count as different walks.",
+    "answer": "522"
+  },
+  {
+    "id": "band",
+    "question": "Count lattice paths from (0,0) to (9,9) using unit steps right or up that never visit a point with |x - y| > 2 and never pass through (3,2), (5,6) or (6,4).",
+    "answer": "2187"
+  },
+  {
+    "id": "succ",
+    "question": "How many permutations p of 1..9 have exactly 2 fixed points and no index i with p(i+1) = p(i) + 1?",
+    "answer": "30234"
+  },
+  {
+    "id": "digits6",
+    "question": "How many 6-digit positive integers have digit sum 30 and are divisible by 11?",
+    "answer": "5112"
+  },
+  {
+    "id": "saw_diag",
+    "question": "How many 8-step self-avoiding walks on the square lattice start at the origin and end at a point on the line y = x? Walks are sequences of unit steps N/S/E/W that never revisit a point; different sequences count as different walks.",
+    "answer": "756"
+  },
+  {
+    "id": "saw_adj",
+    "question": "How many 9-step self-avoiding walks on the square lattice start at the origin and end at a point adjacent to the origin (at distance exactly 1)? Walks are sequences of unit steps N/S/E/W that never revisit a point; different sequences count as different walks.",
+    "answer": "560"
+  },
+  {
+    "id": "saw_quad",
+    "question": "How many 8-step self-avoiding walks on the square lattice start at the origin and end at a point with x > 0 and y > 0? Walks are sequences of unit steps N/S/E/W that never revisit a point; different sequences count as different walks.",
+    "answer": "1218"
+  }
+]
