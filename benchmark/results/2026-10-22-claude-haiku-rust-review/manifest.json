@@ -1,0 +1,67 @@
+{
+  "task": "rust-review",
+  "model": "claude-haiku-5-5",
+  "arms": [
+    "high",
+    "high+gearsecond"
+  ],
+  "runs_per_arm": 30,
+  "problems": {
+    "lib.rs": "4d640c39d60c7a14c55793d093004cb1b9cf168c67e7a3f46f8ef69cd7631fea"
+  },
+  "skills": {
+    "gearsecond": {
+      "sha256": "2390d40b200fa377330a13bb77450fa8d2f66c46580fae80c8419aa8adad0c8f",
+      "file": "skill-gearsecond.md",
+      "source": "plugins/gearsecond/skills/gearsecond/SKILL.md"
+    }
+  },
+  "cli_args": {
+    "high": [
+      "claude",
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "claude-haiku-5-5",
+      "--effort",
+      "high",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--setting-sources",
+      "",
+      "--no-session-persistence",
+      "--append-system-prompt-file",
+      "<problem system text, if any>"
+    ],
+    "high+gearsecond": [
+      "claude",
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "claude-haiku-5-5",
+      "--effort",
+      "high",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--setting-sources",
+      "",
+      "--no-session-persistence",
+      "--append-system-prompt-file",
+      "<problem system text, then skill-gearsecond.md>"
+    ]
+  },
+  "isolation": "no tools, no MCP, no settings sources, fresh empty cwd per run",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.2",
+  "runner_sha256": "b27ccc5e94311490302c37e0a9c6e63a636c83b7d44fcc9a928bf38c09df402b",
+  "bench_sha256": "9011b01161a17dd78ed0363a125bdefe49fee8ef6b3fba91401fde0759f4b2ec",
+  "started_utc": "2026-10-22T14:01:57+00:00",
+  "finished_utc": "2026-10-22T14:18:29+00:00",
+  "cli": "claude",
+  "cli_version": "2.1.308",
+  "note": "Run while the skill was still a draft under another name; its text is byte-identical to the shipped SKILL.md body (same sha256). Arms for other drafts were removed from this published copy."
+}

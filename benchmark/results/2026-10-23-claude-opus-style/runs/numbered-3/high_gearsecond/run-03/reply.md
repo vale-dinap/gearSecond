@@ -1,0 +1,3 @@
+1. Create a composite index matching the filter and sort: `CREATE INDEX CONCURRENTLY idx_orders_customer_created ON orders (customer_id, created_at DESC);`
+2. Replace `SELECT *` with only the columns you need, and add them via `INCLUDE (...)` on that index to enable index-only scans.
+3. Run `EXPLAIN (ANALYZE, BUFFERS)` and `ANALYZE orders;` to confirm the index is used and planner statistics are fresh, raising `default_statistics_target` for `customer_id` if estimates are skewed.

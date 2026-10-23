@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 28778,
+  "stop_reason": "end_turn",
+  "session_id": "9726caee-7e43-4498-bb08-183be8e92fa8",
+  "total_cost_usd": 0.00509978,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 10785,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 5872,
+    "output_tokens_details": {
+      "thinking_tokens": 4330
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 10785,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 5872,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 10785,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 10785
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 5872,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 10785,
+      "webSearchRequests": 0,
+      "costUSD": 0.00509978,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 4330,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I found several real defects. The most serious are a guaranteed panic in `deltas`, a lock-order deadlock between `confirm` and `place_hold`, and three `unsafe` blocks that take untrusted input.\n\n**Panics and UB**\n\n- **`deltas` (L157) always panics on non-empty input.** The loop runs `i` over `0..prices.len()`, so the last iteration reads `prices[len]`. It should iterate `0..len-1` or use `windows(2)`. The `i64` subtraction can also overflow for extreme prices.\n- **`lookup` (L185) reads out of bounds.** `slot` comes from a scanner message, and `get_unchecked` does no check. Use `self.slots.get(slot).copied().flatten()`.\n- **`append_batch` (L194\u2013196) reads freed memory.** `first` points into `buf` before `extend_from_slice`, which can reallocate. Dereferencing `first` afterwards is a use-after-free. The value is always `head`, so `buf[start]` or just `head` is correct.\n- **`decode` (L218) builds a `str` with `from_utf8_unchecked` on network bytes.** Invalid UTF-8 is UB. Use `std::str::from_utf8` and return `Malformed`.\n\n**Arithmetic**\n\n- **`available` (L47) underflows when `reserved > on_hand`.** This state is reachable through `record_loss`. It panics in debug builds and wraps in release, which makes `available()` return a huge number and lets `reserve` succeed.\n- **`ship` (L112) and `record_loss` (L120) underflow `on_hand`.** `ship` only checks `qty` against `reserved`, and `record_loss` does not check at all. Both should validate against `on_hand` and return `Insufficient`.\n- **`total_value` (L127) can overflow.** `on_hand as u64 * price_cents` and the sum are unchecked. Use `checked_mul`/`checked_add` or `saturating_*`.\n- **`place_hold` (L253) panics on a large `ttl`.** `Instant + Duration` panics on overflow. Use `checked_add` and return an error.\n\n**Logic and concurrency**\n\n- **Deadlock (L259, with L245\u2013247).** `place_hold` locks `warehouse` then `holds`. `confirm` locks `holds` then `warehouse` (L262, L265). Two threads running these concurrently can deadlock. `sweep_expired` uses the same order as `place_hold`, so `confirm` is the one to change. Take `warehouse` first, or finish with `holds` before touching `warehouse`.\n- **`receive` (L81) overwrites existing SKUs.** The doc says units are added, but `insert` replaces the item and resets `on_hand` and `reserved`. Existing holds then point at stock that no longer exists. It should update `on_hand` with `saturating_add` when the SKU already exists.\n- **`encode` (L204) truncates the length.** `name.len() as u8` wraps for names over 255 bytes, but the full name is still written, so the frame is corrupt. Reject long names, or check with `u8::try_from`.\n- **`confirm` (L266) drops the hold when `ship` fails.** The hold is already removed, so its reservation is never released. This only happens if the invariant is already broken, but it leaves stock permanently reserved.\n\nISSUES:\nL47: available() underflows when reserved > on_hand (reachable via record_loss)\nL81: receive() overwrites an existing SKU, resetting on_hand and reserved instead of adding\nL112: ship() checks qty against reserved only, so on_hand -= qty can underflow\nL120: record_loss() subtracts without checking, can underflow and leave reserved > on_hand\nL127: total_value() u32*u64 multiplication and sum can overflow\nL157: deltas() indexes prices[i+1] for i up to len-1, out-of-bounds panic on any non-empty input\nL185: lookup() get_unchecked on scanner-supplied slot, out-of-bounds UB\nL196: append_batch() dereferences pointer invalidated by extend_from_slice reallocation, use-after-free\nL204: encode() truncates name length to u8 for names over 255 bytes, corrupt frame\nL218: decode() from_utf8_unchecked on untrusted bytes, UB on invalid UTF-8\nL253: place_hold() Instant + ttl panics on overflow for very large Duration\nL259: confirm() locks holds then warehouse, inverse of place_hold order, deadlock\nL266: confirm() drops hold when ship fails, leaving its reservation permanently held",
+  "ttft_ms": 22995,
+  "type": "result",
+  "duration_ms": 28839,
+  "uuid": "cee11d27-9297-4428-bb4f-b4ee521347a4",
+  "ttft_stream_ms": 5303,
+  "time_to_request_ms": 53,
+  "first_content_frame_ms": 5304,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "lib.rs",
+    "run": 4,
+    "wall_s": 31.7,
+    "finished_utc": "2026-10-22T14:16:16+00:00"
+  }
+}

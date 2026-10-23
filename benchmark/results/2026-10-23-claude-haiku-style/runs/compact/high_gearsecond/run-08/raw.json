@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 2328,
+  "stop_reason": "end_turn",
+  "session_id": "79c1c558-3e98-4cd7-8be4-e54adaa8c94c",
+  "total_cost_usd": 0.00102238,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4568,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 204,
+    "output_tokens_details": {
+      "thinking_tokens": 67
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 4568,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 204,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 4568,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 4568
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 204,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 4568,
+      "webSearchRequests": 0,
+      "costUSD": 0.00102238,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 67,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "Default `[]` built once at `def` time, not per call. Every call that omits `items` gets the same list object, so `append` mutates it.\n\n```python\ndef add(x, items=None):\n    if items is None:\n        items = []\n    items.append(x)\n    return items\n```\n\n`None` is immutable and a sentinel, so each call without `items` makes a fresh list. Same rule for `dict`, `set`, and other mutable defaults.",
+  "ttft_ms": 2374,
+  "type": "result",
+  "duration_ms": 2409,
+  "uuid": "1de453a5-beee-4bff-98f9-a5b996a58161",
+  "ttft_stream_ms": 2373,
+  "time_to_request_ms": 81,
+  "first_content_frame_ms": 2373,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "compact",
+    "run": 8,
+    "wall_s": 6.9,
+    "finished_utc": "2026-10-22T19:50:49+00:00"
+  }
+}

@@ -1,0 +1,3 @@
+1. Create a composite index `CREATE INDEX CONCURRENTLY ON orders (customer_id, created_at DESC);` so Postgres can read the 20 rows directly without sorting.
+2. Replace `SELECT *` with only the needed columns and add them via `INCLUDE (...)` to the index to enable index-only scans.
+3. Run `ANALYZE orders;` (and tune autovacuum) so the planner has fresh statistics, then verify the plan with `EXPLAIN (ANALYZE, BUFFERS)`.

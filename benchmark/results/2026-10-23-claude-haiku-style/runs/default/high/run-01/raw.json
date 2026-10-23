@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 13861,
+  "stop_reason": "end_turn",
+  "session_id": "0b714bc9-cfa9-40b2-ace4-97ceef366939",
+  "total_cost_usd": 0.00178989,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 3036,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 2352,
+    "output_tokens_details": {
+      "thinking_tokens": 1189
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 3036,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 2352,
+        "cache_read_input_tokens": 649,
+        "cache_creation_input_tokens": 3036,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 3036
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 2352,
+      "cacheReadInputTokens": 649,
+      "cacheCreationInputTokens": 3036,
+      "webSearchRequests": 0,
+      "costUSD": 0.00178989,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1189,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "## Why immediate retries make an outage worse\n\n**1. They multiply load on a dependency that is already struggling.** If a call can make up to 5 retries, each failed request becomes 6 attempts. During a full outage, every incoming request produces 6 calls to the dependency instead of 1. The extra traffic arrives at the moment the dependency has the least capacity to absorb it, so it can't recover.\n\n**2. The multiplication compounds across layers.** If the caller's caller uses the same policy, the effect is 6 \u00d7 6 = 36 attempts per user action. Three layers gives 216. Each layer's retries look reasonable on their own, but together they can produce a 100x traffic spike.\n\n**3. Immediate retries synchronize.** Every instance of the service sees failures at roughly the same time and retries at roughly the same time, so the load arrives in waves rather than spread out. Each wave can push the dependency back down just as it starts to recover.\n\n**4. They hold resources in the caller.** Each in-flight retry occupies a thread, connection, or socket. The caller's pool fills up with calls waiting on a dead dependency, and the caller starts failing requests for its own clients. That failure spreads upstream and triggers more retries there.\n\n**5. Retrying transient-looking errors that aren't transient.** A dependency that is down for minutes will not succeed on attempts 2 through 6 separated by milliseconds. The retries only add cost.\n\n## The retry policy I would use instead\n\n**Retry only what is safe and likely to succeed:**\n- Retry on connection errors, timeouts, 502, 503, 504, and 429 (honoring `Retry-After`).\n- Do not retry other 4xx responses. They will fail the same way again.\n- Retry non-idempotent operations (POST, payments) only with an idempotency key.\n\n**Keep attempts low.** Two retries (3 total attempts) is usually enough to smooth over a blip. More rarely helps and mostly adds load.\n\n**Back off exponentially with full jitter:**\n\n```\nsleep = random(0, min(cap, base \u00d7 2^attempt))\n```\n\nFor example, with `base = 100ms` and `cap = 5s`, the waits are random values up to 100ms, then up to 200ms. Jitter spreads retries out so instances don't move in lockstep.\n\n**Enforce a retry budget.** Limit retries to a fraction of total traffic, for example 10\u201320% of requests over a rolling window, using a token bucket. When the budget is spent, fail fast. This caps amplification no matter how many errors occur, which matters more than the per-call attempt count.\n\n**Add a circuit breaker.** When the failure rate crosses a threshold (say 50% over 10 seconds), open the circuit and fail fast without calling the dependency. After a cooldown (say 30 seconds), let a few probe requests through (half-open). Close the circuit if they succeed. This gives the dependency room to recover.\n\n**Respect a total deadline.** Propagate a request deadline so retries never run past what the caller is willing to wait. Don't start an attempt that can't finish before the deadline.\n\n**Retry at one layer.** Decide where retries live and make other layers pass failures through. If every layer retries, the multiplication above happens.\n\n**Degrade gracefully.** When the circuit is open, serve cached or partial data where possible, or return a clear error quickly instead of hanging.\n\n**Monitor retry rate.** Track retries as a separate metric from requests. A rising retry ratio is an early warning of a dependency problem and of self-inflicted load.",
+  "ttft_ms": 7866,
+  "type": "result",
+  "duration_ms": 13924,
+  "uuid": "53b6528e-866a-4444-927c-a7a7ddec6932",
+  "ttft_stream_ms": 2855,
+  "time_to_request_ms": 58,
+  "first_content_frame_ms": 2856,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high",
+    "problem": "default",
+    "run": 1,
+    "wall_s": 16.9,
+    "finished_utc": "2026-10-22T19:51:22+00:00"
+  }
+}

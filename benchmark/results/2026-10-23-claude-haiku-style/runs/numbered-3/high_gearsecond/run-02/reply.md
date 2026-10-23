@@ -1,0 +1,3 @@
+1. Add composite index: `CREATE INDEX CONCURRENTLY ON orders (customer_id, created_at DESC);` so the query reads ordered rows directly.
+2. Use `INCLUDE` columns or a covering index to avoid heap lookups when `SELECT *` only needs a few columns, and check `EXPLAIN (ANALYZE, BUFFERS)` shows an Index Scan rather than a Sort.
+3. Keep statistics fresh with `ANALYZE orders;` and consider partitioning `orders` by `created_at` or `customer_id` if the table keeps growing.

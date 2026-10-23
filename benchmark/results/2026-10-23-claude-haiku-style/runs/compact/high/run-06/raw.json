@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 2528,
+  "stop_reason": "end_turn",
+  "session_id": "c62a70e1-a857-4368-93e2-48b3bd54dad3",
+  "total_cost_usd": 0.0007792800000000001,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 3125,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 295,
+    "output_tokens_details": {
+      "thinking_tokens": 104
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 3125,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 295,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 3125,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 3125
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 295,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 3125,
+      "webSearchRequests": 0,
+      "costUSD": 0.0007792800000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 104,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "Default arg `[]` evaluated once, at `def` time. Same list object reused every call.\n\n```python\nadd.__defaults__  # ([1, 2],) after two calls\n```\n\n- `add(1)`: appends to shared list -> `[1]`\n- `add(2)`: appends to same list -> `[1, 2]`\n\nFix: default to `None`, make new list per call.\n\n```python\ndef add(x, items=None):\n    if items is None:\n        items = []\n    items.append(x)\n    return items\n```\n\nNow `add(1)` -> `[1]`, `add(2)` -> `[2]`.",
+  "ttft_ms": 2194,
+  "type": "result",
+  "duration_ms": 2588,
+  "uuid": "4e5a54f7-69de-4ae5-b634-a004f0d4ca37",
+  "ttft_stream_ms": 2192,
+  "time_to_request_ms": 57,
+  "first_content_frame_ms": 2193,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high",
+    "problem": "compact",
+    "run": 6,
+    "wall_s": 7.1,
+    "finished_utc": "2026-10-22T19:50:52+00:00"
+  }
+}

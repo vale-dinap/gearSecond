@@ -1,0 +1,1 @@
+Rust enforces that a value has either one mutable reference or any number of shared references at a time, so the compiler can prove no two parts of the program write to the same data at once and no reader sees data changing underneath it. This prevents data races and iterator invalidation, along with related bugs like use-after-free and dangling pointers.

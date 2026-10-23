@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 25793,
+  "stop_reason": "end_turn",
+  "session_id": "ca1fcc01-2960-4d33-bc66-bce7e4d3eac9",
+  "total_cost_usd": 0.00473848,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 10781,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 5151,
+    "output_tokens_details": {
+      "thinking_tokens": 3658
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 10781,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 5151,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 10781,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 10781
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 5151,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 10781,
+      "webSearchRequests": 0,
+      "costUSD": 0.00473848,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 3658,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "## Defects\n\n**Undefined behaviour and memory safety**\n\n- **`SlotTable::lookup` (L185)** calls `get_unchecked` on `slot`, which the doc comment says comes straight from a scanner message. Any out-of-range slot is an out-of-bounds read. Use `self.slots.get(slot).copied().flatten()`.\n- **`append_batch` (L194-197)** takes `first` as a raw pointer into `buf` before `extend_from_slice`. The extend can reallocate, leaving `first` dangling, and the dereference at L196 is a use-after-free. The value is just `head`, so return `head` and drop the pointer entirely.\n- **`decode` (L218)** calls `from_utf8_unchecked` on bytes from the network. Invalid UTF-8 is immediate UB. Use `std::str::from_utf8` and map the error to `Malformed`.\n\n**Integer overflow and underflow**\n\n- **`record_loss` (L120)** does `on_hand -= lost` unchecked, so `lost > on_hand` panics in debug and wraps in release. It also lets `on_hand` drop below `reserved`, which breaks the invariant that `available()` (L47) and `ship` (L112) rely on. Check `lost <= on_hand - reserved` and return an error.\n- **`total_value` (L127)** does `on_hand as u64 * price_cents` and then `sum()`, both unchecked. Use `checked_mul` and `checked_add`, or saturate.\n- **`deltas` (L157)** subtracts `i64` values unchecked, so extreme prices overflow. Use `checked_sub`.\n- **`place_hold` (L253)** does `Instant::now() + ttl`, which panics for a large `Duration`. Use `checked_add` and return an error.\n\n**Logic errors**\n\n- **`receive` (L80-81)** uses `insert`, which replaces an existing SKU. The doc says units are added, but `on_hand` is set to `qty` and `reserved` is reset to 0. Outstanding holds then point at reservations that no longer exist, so `confirm` fails. Update the existing entry instead.\n- **`encode` (L204)** casts `name.len()` to `u8` without a check. A name over 255 bytes produces a length byte that disagrees with the payload, so the frame is corrupt. Return an error for names over 255 bytes.\n- **`confirm` (L265-266)** removes the hold at L260 before shipping. If `ship` fails (for example after the overwrite above), the hold is lost and the units are never released. Ship first, or restore the hold on failure.\n- **`moving_average` (L143)** asserts on `window == 0`, so bad input from a caller panics. That may be intended, but it is worth a documented `Result` if callers are untrusted.\n\n**Concurrency**\n\n- **Lock-order inversion.** `place_hold` (L245, then L247) and `sweep_expired` (L272, then L273) lock `warehouse` before `holds`. `confirm` (L259, then L265) locks `holds` before `warehouse`. If one thread is in `confirm` and another in `place_hold` or `sweep_expired`, they can deadlock. Pick one order everywhere, for example `warehouse` then `holds`, and make `confirm` follow it by taking the warehouse lock first.\n\nNothing else I checked is a defect. `moving_average` handles `window > len` correctly, the `saturating_sub` in `release` is intentional, and the `decode` length check at L215 is sound.\n\nISSUES:\nL47: available() underflows when on_hand < reserved, reachable via record_loss\nL80: receive replaces existing SKU, losing on_hand/reserved and orphaning holds\nL120: record_loss unchecked subtraction, can underflow and break reserved <= on_hand\nL127: total_value u64 multiply and sum can overflow\nL157: deltas i64 subtraction can overflow\nL185: get_unchecked on scanner-supplied slot, out-of-bounds UB\nL196: raw pointer read after extend_from_slice may reallocate, use-after-free\nL204: name length truncated to u8 without check, corrupt frame\nL218: from_utf8_unchecked on network bytes, UB on invalid UTF-8\nL253: Instant + ttl panics on large Duration\nL259: confirm locks holds before warehouse, inverse of place_hold/sweep order, deadlock\nL266: confirm removes hold before ship, lost hold if ship fails",
+  "ttft_ms": 20006,
+  "type": "result",
+  "duration_ms": 25844,
+  "uuid": "7676610b-bb58-4eed-8f85-b63301dca011",
+  "ttft_stream_ms": 3376,
+  "time_to_request_ms": 43,
+  "first_content_frame_ms": 3376,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "lib.rs",
+    "run": 12,
+    "wall_s": 28.5,
+    "finished_utc": "2026-10-22T14:07:07+00:00"
+  }
+}

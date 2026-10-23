@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 4869,
+  "stop_reason": "end_turn",
+  "session_id": "62f04417-171c-4165-96c2-10406bdd3d73",
+  "total_cost_usd": 0.0252516,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 2339,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 320,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 2339,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 320,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 2339,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2339
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 320,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 2339,
+      "webSearchRequests": 0,
+      "costUSD": 0.0252516,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "Default args evaluated once, at `def` time, not per call. `items=[]` makes one list object, stored in `add.__defaults__`. Every call without `items` reuses same list. First call appends 1 \u2192 `[1]`. Second call appends 2 to same list \u2192 `[1, 2]`.\n\nCheck:\n```python\nadd(1); print(add.__defaults__)  # ([1],)\n```\n\nFix: use `None` sentinel, make new list inside body.\n\n```python\ndef add(x, items=None):\n    if items is None:\n        items = []\n    items.append(x)\n    return items\n```\n\nNow `add(1)` \u2192 `[1]`, `add(2)` \u2192 `[2]`.\n\nUse `is None`, not `if not items`. Otherwise caller passing own empty list gets it swapped for new one, and their list never mutated.\n\nSame trap for any mutable default: `{}`, `set()`, custom objects. Linters flag it (pylint `W0102`, ruff/flake8-bugbear `B006`).",
+  "ttft_ms": 4880,
+  "type": "result",
+  "duration_ms": 4924,
+  "uuid": "6ee89bd1-3bd8-480a-9ea4-698f0b3bf4c7",
+  "ttft_stream_ms": 3088,
+  "time_to_request_ms": 52,
+  "first_content_frame_ms": 3089,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high",
+    "problem": "compact",
+    "run": 1,
+    "wall_s": 8.0,
+    "finished_utc": "2026-10-22T19:52:39+00:00"
+  }
+}

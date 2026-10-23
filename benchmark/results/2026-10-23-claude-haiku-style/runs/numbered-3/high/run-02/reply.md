@@ -1,0 +1,3 @@
+1. Add a composite index on `orders (customer_id, created_at DESC)` so Postgres can read the 20 newest rows for a customer directly from the index.
+2. Select only the columns you need instead of `SELECT *`, ideally with a covering index `INCLUDE` list, so the query can run as an index-only scan.
+3. Run `EXPLAIN (ANALYZE, BUFFERS)` on the query before and after the change to confirm it uses an Index Scan and no longer sorts 50 million rows.

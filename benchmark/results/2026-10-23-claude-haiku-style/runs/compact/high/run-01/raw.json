@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 3423,
+  "stop_reason": "end_turn",
+  "session_id": "6c7534eb-b683-42bb-a03c-16fb3756a854",
+  "total_cost_usd": 0.00084638,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 3123,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 430,
+    "output_tokens_details": {
+      "thinking_tokens": 179
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 3123,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 430,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 3123,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 3123
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 430,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 3123,
+      "webSearchRequests": 0,
+      "costUSD": 0.00084638,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 179,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "Default `[]` is built once, when `def` runs, not per call. Every call that omits `items` gets that same list object. `append` mutates it, so state leaks between calls:\n\n```python\nadd(1)  # default list becomes [1], returned\nadd(2)  # same list, now [1, 2], returned\n```\n\nCheck: `add.__defaults__` shows the shared list growing.\n\nFix: use `None` sentinel, create fresh list per call:\n\n```python\ndef add(x, items=None):\n    if items is None:\n        items = []\n    items.append(x)\n    return items\n```\n\nNow `add(1)` \u2192 `[1]`, `add(2)` \u2192 `[2]`.\n\nRule: never use mutable literal (`[]`, `{}`, `set()`) as default. Use `None`, create inside body.",
+  "ttft_ms": 2605,
+  "type": "result",
+  "duration_ms": 3506,
+  "uuid": "3d990136-cea5-4b2f-a38f-9a190f3350df",
+  "ttft_stream_ms": 2603,
+  "time_to_request_ms": 80,
+  "first_content_frame_ms": 2603,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high",
+    "problem": "compact",
+    "run": 1,
+    "wall_s": 7.2,
+    "finished_utc": "2026-10-22T19:50:11+00:00"
+  }
+}

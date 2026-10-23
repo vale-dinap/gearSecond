@@ -1,0 +1,1 @@
+Rust forbids two simultaneous mutable references to one value so that no code can write through one reference while another reads or writes the same data, which the compiler enforces through its borrow checker at compile time. This prevents data races and iterator invalidation, where a mutation through one alias leaves another alias pointing at stale or freed memory.

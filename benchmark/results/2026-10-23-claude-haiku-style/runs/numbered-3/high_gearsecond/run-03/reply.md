@@ -1,0 +1,3 @@
+1. Add a composite index on `orders (customer_id, created_at DESC)` so Postgres can return the 20 newest rows via an index scan without sorting 50M rows.
+2. Run `EXPLAIN (ANALYZE, BUFFERS)` to confirm the plan uses an Index Scan with no Sort node, and check whether the index is actually picked.
+3. If the table is large and still slow, partition `orders` by range on `created_at` (or hash on `customer_id`) so each query touches a smaller set of partitions.

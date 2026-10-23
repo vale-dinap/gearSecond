@@ -1,0 +1,70 @@
+{
+  "task": "style",
+  "model": "claude-opus-5-5",
+  "arms": [
+    "high",
+    "high+gearsecond"
+  ],
+  "runs_per_arm": 3,
+  "problems": {
+    "two-sentences": "f32555faf7d7100d616ed7c8f965c06b94f6c53615a49ff9bf9f87ceeca69e6b",
+    "numbered-3": "2a4d04e6e0e2e1b91a35ccd14903559ec36309456d88232b68a8986861d9ed09",
+    "compact": "fdbfffd3e21b5985c1c0f8c50d0ca6b8ad2a2476128f586e1f49f6ecf39f7117",
+    "default": "d0035da801a0b6af7929857639ce2cc7304383154ebf91ca217ce5d1e500ad7d"
+  },
+  "skills": {
+    "gearsecond": {
+      "sha256": "2390d40b200fa377330a13bb77450fa8d2f66c46580fae80c8419aa8adad0c8f",
+      "file": "skill-gearsecond.md",
+      "source": "plugins/gearsecond/skills/gearsecond/SKILL.md"
+    }
+  },
+  "cli_args": {
+    "high": [
+      "claude",
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "claude-opus-5-5",
+      "--effort",
+      "high",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--setting-sources",
+      "",
+      "--no-session-persistence",
+      "--append-system-prompt-file",
+      "<problem system text, if any>"
+    ],
+    "high+gearsecond": [
+      "claude",
+      "-p",
+      "--output-format",
+      "json",
+      "--model",
+      "claude-opus-5-5",
+      "--effort",
+      "high",
+      "--tools",
+      "",
+      "--strict-mcp-config",
+      "--setting-sources",
+      "",
+      "--no-session-persistence",
+      "--append-system-prompt-file",
+      "<problem system text, then skill-gearsecond.md>"
+    ]
+  },
+  "isolation": "no tools, no MCP, no settings sources, fresh empty cwd per run",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.2",
+  "runner_sha256": "3f890210d6c6397ce42a404f5eebac88a661e639e21e33d92f64bd2937a428d6",
+  "bench_sha256": "9011b01161a17dd78ed0363a125bdefe49fee8ef6b3fba91401fde0759f4b2ec",
+  "started_utc": "2026-10-22T19:51:54+00:00",
+  "finished_utc": "2026-10-22T19:53:01+00:00",
+  "cli": "claude",
+  "cli_version": "2.1.308",
+  "note": "Run while the skill was still a draft under another name; its text is byte-identical to the shipped SKILL.md body (same sha256). Arms for other drafts were removed from this published copy."
+}

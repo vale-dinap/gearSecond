@@ -1,0 +1,3 @@
+1. Create a composite index: `CREATE INDEX CONCURRENTLY idx_orders_customer_created ON orders (customer_id, created_at DESC);`
+2. Replace `SELECT *` with only the needed columns, and add them via `INCLUDE (...)` on that index to enable index-only scans.
+3. Run `ANALYZE orders;` (and check `EXPLAIN (ANALYZE, BUFFERS)`) so the planner has fresh stats and actually uses the index instead of a sort or seq scan.

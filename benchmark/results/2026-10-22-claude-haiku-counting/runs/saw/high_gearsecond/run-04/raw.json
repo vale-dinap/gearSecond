@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 297467,
+  "stop_reason": "end_turn",
+  "session_id": "4200d96c-114b-47e2-ba5b-a89e4ff91f21",
+  "total_cost_usd": 0.03619088,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4543,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 70551,
+    "output_tokens_details": {
+      "thinking_tokens": 70284
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 4543,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 70551,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 4543,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 4543
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 70551,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 4543,
+      "webSearchRequests": 0,
+      "costUSD": 0.03619088,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 70284,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**Answer: 522**\n\nWalks of length 8 end at (x,0) only for even x, so I counted each endpoint and used the reflection x \u2192 \u2212x:\n\n| Endpoint | Walks |\n|---|---|\n| (\u00b18,0) | 1 each |\n| (\u00b16,0) | 42 each |\n| (\u00b14,0) | 126 each |\n| (\u00b12,0) | 92 each |\n\nTotal = 2 \u00d7 (1 + 42 + 126 + 92) = 522.\n\nThe counts come from a hand enumeration, not code. Each walk is split into horizontal segments, with vertical excursions between them, and the self-avoidance constraints are checked per column. Spot checks: the method reproduces the 6 four-step walks ending at (2,0) and the 6 three-step walks ending on the x-axis.\n\nANSWER: 522",
+  "ttft_ms": 296711,
+  "type": "result",
+  "duration_ms": 297537,
+  "uuid": "26a7b51c-9c2f-4cc1-b2d4-1ef2886ccef1",
+  "ttft_stream_ms": 2353,
+  "time_to_request_ms": 64,
+  "first_content_frame_ms": 2353,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "saw",
+    "run": 4,
+    "wall_s": 300.4,
+    "finished_utc": "2026-10-22T17:39:21+00:00"
+  }
+}

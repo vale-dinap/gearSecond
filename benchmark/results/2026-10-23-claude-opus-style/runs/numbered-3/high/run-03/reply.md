@@ -1,0 +1,3 @@
+1. Add a composite index: `CREATE INDEX CONCURRENTLY ON orders (customer_id, created_at DESC);` so Postgres can read the 20 newest rows directly instead of sorting.
+2. Replace `SELECT *` with only the columns you need (optionally using `INCLUDE (...)` on the index) to enable index-only scans and cut heap fetches.
+3. Run `ANALYZE orders;` and check `EXPLAIN (ANALYZE, BUFFERS)` to confirm the planner uses the index, raising the `customer_id` statistics target if estimates are skewed.

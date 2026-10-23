@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 16308,
+  "stop_reason": "end_turn",
+  "session_id": "0f81e27b-f1c7-4dc6-bff3-6a0ee06890c2",
+  "total_cost_usd": 0.05785560000000001,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 3697,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 1407,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 3697,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1407,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 3697,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 3697
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1407,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 3697,
+      "webSearchRequests": 0,
+      "costUSD": 0.05785560000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "## Why immediate retries made it worse\n\n**1. They multiply load exactly when the dependency can least handle it.**\nWith up to 5 retries, every failing request becomes up to 6 requests. If the dependency is struggling at 1,000 req/s, your service can turn that into 6,000 req/s. A dependency that was degraded becomes saturated, and one that was trying to recover gets pushed back down. This is a *retry storm*.\n\n**2. Immediate retries are synchronized.**\nEvery client sees the failure at roughly the same moment and retries at roughly the same moment. That produces waves of traffic aligned in time (a *thundering herd*), instead of load spread out evenly. A recovering server gets hit by a spike right as it comes back up.\n\n**3. Retrying immediately almost never helps.**\nOutages, overloads, GC pauses, failovers, and restarts last seconds to minutes. A retry 2 ms later hits the same broken state, so you pay the full cost of the retry and get nothing back.\n\n**4. It amplifies through layers.**\nIf A calls B calls C, and each layer retries 5 times, a failure at C produces up to 6 \u00d7 6 = 36 calls from one user request. Deep call chains turn modest retry counts into huge amplification.\n\n**5. It ties up your own resources.**\nThreads, connections, and sockets sit busy cycling through retries. Your service's latency climbs, its pools fill up, and its own callers start timing out and retrying. The outage spreads upstream.\n\n**6. Some failures shouldn't be retried at all.**\nBlindly retrying 400s, 401s, or non-idempotent POSTs wastes capacity and can cause duplicate side effects.\n\n## The retry policy I'd use instead\n\n**Only retry what's retryable**\n- Retry: connection errors, timeouts, 502/503/504, and 429.\n- Don't retry: other 4xx, or non-idempotent operations unless they carry an idempotency key.\n- Honor `Retry-After` on 429/503.\n\n**Exponential backoff with jitter**\n- Delay \u2248 `random(0, min(cap, base * 2^attempt))` (\"full jitter\").\n- Example: base 100 ms, cap 10\u201330 s.\n- Backoff gives the dependency time to recover. Jitter de-synchronizes clients so retries don't arrive in waves.\n\n**Fewer attempts, bounded by a deadline**\n- 2\u20133 retries, not 5.\n- Bound the whole operation by a total time budget or deadline, and propagate that deadline downstream so nobody keeps retrying work whose caller already gave up.\n\n**A retry budget**\n- Cap retries at a fraction of normal traffic, e.g. retries may be at most 10% of requests over a sliding window (a token bucket works well).\n- In normal times a few retries smooth over blips. During a real outage the budget runs out quickly and load stays close to 1\u00d7, not 6\u00d7.\n\n**A circuit breaker**\n- When the error rate crosses a threshold, open the circuit and fail fast, with no calls to the dependency.\n- After a cooldown, go half-open and let a few probe requests through. Close the circuit once they succeed.\n- This stops hammering the dependency and frees your own threads.\n\n**Retry at one layer only**\n- Pick one layer (usually the outermost or the one closest to the failing call) to own retries. The others fail fast. This avoids multiplicative amplification.\n\n**Degrade gracefully when retries are exhausted**\n- Serve cached or stale data, a default response, or a fast clear error. Don't hang.\n\n### Summary\n\n| Before | After |\n|---|---|\n| Retry everything | Retry only transient, idempotent failures |\n| 0 ms delay | Exponential backoff + full jitter, honor `Retry-After` |\n| 5 retries | 2\u20133 retries within a total deadline |\n| Unlimited retry volume | Retry budget (~10% of traffic) |\n| Keep calling a dead dependency | Circuit breaker, fail fast |\n| Every layer retries | One layer retries |\n\nThe core idea: retries should help with *brief, random* failures and get out of the way during *sustained* ones. Immediate unbounded retries do the opposite. They add the most load exactly when the system is least able to handle it.",
+  "ttft_ms": 16357,
+  "type": "result",
+  "duration_ms": 16396,
+  "uuid": "84a94742-c070-4219-ad01-44a6e1210c6c",
+  "ttft_stream_ms": 2589,
+  "time_to_request_ms": 85,
+  "first_content_frame_ms": 2589,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "default",
+    "run": 1,
+    "wall_s": 19.6,
+    "finished_utc": "2026-10-22T19:52:54+00:00"
+  }
+}

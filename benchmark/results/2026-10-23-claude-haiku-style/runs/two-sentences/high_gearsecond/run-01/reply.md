@@ -1,0 +1,1 @@
+Rust allows either many shared references or one mutable reference to a value at a time, never both, because a mutable reference lets code change data that another reference is reading or relying on. This rules out data races and invalidated references, such as a `Vec` reallocating while a reference to one of its elements still points at the old buffer.

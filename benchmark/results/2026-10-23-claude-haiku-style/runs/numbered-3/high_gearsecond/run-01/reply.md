@@ -1,0 +1,3 @@
+1. Add composite index `CREATE INDEX CONCURRENTLY ON orders (customer_id, created_at DESC);` so the filter and sort are served by one index scan.
+2. Run `EXPLAIN (ANALYZE, BUFFERS)` to confirm the plan uses an Index Scan instead of a Seq Scan plus sort.
+3. Consider partitioning `orders` by `created_at` range, or using a covering index with `INCLUDE` for the selected columns, if the table keeps growing.

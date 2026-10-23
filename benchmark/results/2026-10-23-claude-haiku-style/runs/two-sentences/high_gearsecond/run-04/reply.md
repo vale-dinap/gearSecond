@@ -1,0 +1,1 @@
+Rust allows either one mutable reference or any number of shared references to a value at a time, so code that holds two mutable references can't be proven safe and is rejected at compile time. This prevents data races and aliasing bugs, such as iterator invalidation and dangling pointers after a mutation through another handle.

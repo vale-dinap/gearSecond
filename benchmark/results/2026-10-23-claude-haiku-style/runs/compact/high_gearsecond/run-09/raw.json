@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 3849,
+  "stop_reason": "end_turn",
+  "session_id": "17f9131a-fef0-4484-abf0-106c4144d655",
+  "total_cost_usd": 0.00115338,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4568,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 466,
+    "output_tokens_details": {
+      "thinking_tokens": 231
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 4568,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 466,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 4568,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 4568
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 466,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 4568,
+      "webSearchRequests": 0,
+      "costUSD": 0.00115338,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 231,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "Default `[]` is built once, when `def` runs, not per call. Every call that omits `items` reuses that same list object.\n\n- `add(1)`: appends `1` to the shared list, returns it -> `[1]`\n- `add(2)`: same list, appends `2` -> `[1, 2]`\n\n`.append` mutates in place, so the shared list keeps growing. Also, the list returned by `add(1)` is that same object, so it changes too.\n\nFix: use `None` as sentinel, make new list per call:\n\n```python\ndef add(x, items=None):\n    if items is None:\n        items = []\n    items.append(x)\n    return items\n```\n\nNow `add(1)` -> `[1]`, `add(2)` -> `[2]`.",
+  "ttft_ms": 2895,
+  "type": "result",
+  "duration_ms": 3918,
+  "uuid": "3b915479-2e8d-4c28-9447-fe68d3bd1a42",
+  "ttft_stream_ms": 2894,
+  "time_to_request_ms": 64,
+  "first_content_frame_ms": 2894,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "compact",
+    "run": 9,
+    "wall_s": 7.9,
+    "finished_utc": "2026-10-22T19:49:58+00:00"
+  }
+}

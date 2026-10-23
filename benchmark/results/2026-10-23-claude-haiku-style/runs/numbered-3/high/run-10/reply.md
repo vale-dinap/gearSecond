@@ -1,0 +1,3 @@
+1. Add a composite index on `orders (customer_id, created_at DESC)` so Postgres can read the 20 newest rows for a customer directly from the index without sorting the full match set.
+2. Use `CREATE INDEX CONCURRENTLY` for that index so the build doesn't block writes on the 50M-row table, then run `VACUUM ANALYZE orders` so the planner has current statistics.
+3. Check `EXPLAIN (ANALYZE, BUFFERS)` output to confirm an Index Scan (not a Seq Scan or Sort node) is used, and if `SELECT *` pulls wide columns, consider a covering index with `INCLUDE` or selecting only needed columns.

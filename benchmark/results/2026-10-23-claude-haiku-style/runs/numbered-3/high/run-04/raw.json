@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 2175,
+  "stop_reason": "end_turn",
+  "session_id": "075998ff-b769-4d46-a8fd-6b44d242bd93",
+  "total_cost_usd": 0.00072289,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 3066,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 206,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 3066,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 206,
+        "cache_read_input_tokens": 649,
+        "cache_creation_input_tokens": 3066,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 3066
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 206,
+      "cacheReadInputTokens": 649,
+      "cacheCreationInputTokens": 3066,
+      "webSearchRequests": 0,
+      "costUSD": 0.00072289,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "1. Add a composite index on `orders (customer_id, created_at DESC)` so Postgres can filter and return the newest 20 rows directly from the index.\n2. Run `EXPLAIN (ANALYZE, BUFFERS)` on the query to confirm it uses an Index Scan (not a Seq Scan or a top-N sort over many rows) after adding the index.\n3. Consider partitioning `orders` by `created_at` (range partitions, e.g. monthly) so queries touching recent data scan far fewer rows, and run `VACUUM ANALYZE` after bulk loads so the planner has current statistics.",
+  "ttft_ms": 2230,
+  "type": "result",
+  "duration_ms": 2242,
+  "uuid": "ee43522a-40f5-4ca1-822e-3aaea7df64c5",
+  "ttft_stream_ms": 2227,
+  "time_to_request_ms": 66,
+  "first_content_frame_ms": 2227,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high",
+    "problem": "numbered-3",
+    "run": 4,
+    "wall_s": 5.9,
+    "finished_utc": "2026-10-22T19:51:14+00:00"
+  }
+}

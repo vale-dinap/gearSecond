@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 9288,
+  "stop_reason": "end_turn",
+  "session_id": "f667df27-b7f9-4299-a8a2-a4390c1de996",
+  "total_cost_usd": 0.00138849,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 3034,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 1550,
+    "output_tokens_details": {
+      "thinking_tokens": 507
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 3034,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1550,
+        "cache_read_input_tokens": 649,
+        "cache_creation_input_tokens": 3034,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 3034
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1550,
+      "cacheReadInputTokens": 649,
+      "cacheCreationInputTokens": 3034,
+      "webSearchRequests": 0,
+      "costUSD": 0.00138849,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 507,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "Immediate retries multiply the load on a dependency exactly when it has the least capacity to absorb it.\n\n**Why it made the outage worse**\n\n- **Load amplification.** With 1 original attempt and 5 retries, each failing request becomes up to 6 requests. If the dependency is already overloaded, the retries add load on top of the traffic that was already too much for it. Recovery stalls because the dependency never gets a window to drain its queues.\n- **Multiplication across layers.** If the service sits behind another retrying caller, the factors compound. Two layers with 6 attempts each can send up to 36 requests for every original one.\n- **Synchronized retries.** Many clients failing at the same moment all retry at the same moment, since they have no delay or jitter. That produces a spike at each retry interval rather than a smooth load, which is a thundering herd.\n- **Resource holding.** Each failed attempt can hold connections, threads, or memory for the full timeout. Retrying immediately keeps the caller's own pools full, so the caller degrades too.\n- **Retrying errors that won't clear.** A 400 or 404 will fail again, and a 429 or 503 needs time to pass. Immediate retries waste capacity on requests that cannot succeed.\n- **Recovery storm.** When the dependency comes back, every queued retry hits it at once, so it can fall over again immediately.\n\n**A better policy**\n\n1. **Exponential backoff with full jitter.** Wait `random(0, min(cap, base \u00d7 2^attempt))`. For example, use a base of 200 ms and a cap of 10 s. The randomness spreads clients out so they don't retry in lockstep.\n2. **Few attempts.** Use 2 or 3 total attempts, not 6. Retries are for transient faults, and a longer tail adds little.\n3. **A retry budget.** Limit retries to a fraction of total traffic, such as 10%, using a token bucket or a ratio check. This caps amplification regardless of how many requests fail. Retries are only allowed while the budget has tokens.\n4. **Retry only what's safe and useful.** Retry timeouts, connection resets, 502, 503, 504, and 429. Don't retry other 4xx codes. Retry non-idempotent operations only with an idempotency key.\n5. **Honor `Retry-After`.** If the dependency says when to come back, wait at least that long.\n6. **Use a circuit breaker.** After a threshold of failures, stop calling the dependency for a cooldown period and fail fast. Then let a few trial requests through (half-open) before resuming. This is what actually stops the storm during an outage.\n7. **Respect an overall deadline.** Set a total time budget for the request and per-attempt timeouts within it. Don't retry once the budget is spent.\n8. **Retry at one layer.** Let one layer own retries and have the others fail fast, so the multiplication never happens.\n\nIn short, the original policy retried too many times, too soon, in sync, and without limit. The replacement waits progressively longer with randomness, caps total attempts and the share of traffic retries can add, stops calling a dependency that is clearly down, and retries only errors that might succeed on a later try.",
+  "ttft_ms": 3710,
+  "type": "result",
+  "duration_ms": 9396,
+  "uuid": "411201c7-ca56-4c2d-b4dd-93bc9a2f481c",
+  "ttft_stream_ms": 2448,
+  "time_to_request_ms": 105,
+  "first_content_frame_ms": 2448,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high",
+    "problem": "default",
+    "run": 5,
+    "wall_s": 15.9,
+    "finished_utc": "2026-10-22T19:49:23+00:00"
+  }
+}

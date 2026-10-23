@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 245047,
+  "stop_reason": "end_turn",
+  "session_id": "bd544a1b-86b2-4653-89a7-98b7d1c33d58",
+  "total_cost_usd": 0.029553379999999997,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4543,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 57276,
+    "output_tokens_details": {
+      "thinking_tokens": 56634
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 4543,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 57276,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 4543,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 4543
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 57276,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 4543,
+      "webSearchRequests": 0,
+      "costUSD": 0.029553379999999997,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 56634,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "**Answer: 522**\n\nWalks ending at (0,0) are impossible, so the endpoint is (x,0) with x even and nonzero. Symmetry under x \u2192 -x means I count x > 0 and double.\n\nCounts by endpoint, split by the number of horizontal steps h = e + w:\n\n- **(\u00b18,0): 1 each.** All 8 steps must be E (or all W).\n- **(\u00b16,0): 42 each.** Either 6E+N+S, with N and S in different non-adjacent positions (42), or 7E+W, which is never self-avoiding. Total 42.\n- **(\u00b14,0): 126 each.**\n  - h=4 (4E, 2N, 2S): the vertical moves split into 5 column blocks, each monotone. Count = 110.\n  - h=6 (5E, W, N, S): the W must sit alone in its row segment. Eight valid horizontal-segment patterns, times 2 for N-first or S-first, gives 16.\n  - h=8: 0.\n- **(\u00b12,0): 92 each.**\n  - h=2 (2E, 3N, 3S): three columns with monotone vertical runs. Count = 18.\n  - h=4 (3E, W, 2N, 2S): split by where the W falls among the four horizontal moves. The four patterns give 30, 2, 2, 30. A reversal-plus-reflection symmetry pairs the patterns as (30,30) and (2,2), which checks out.\n  - h=6 (4E, 2W, N, S): five valid (D0, D1, D2) segment triples, times 2 for the vertical order, gives 10.\n  - h=8: 0.\n\nTotal over the x-axis:\n\n2 \u00d7 (92 + 126 + 42 + 1) = 2 \u00d7 261 = **522**\n\nThe h=4 subcase for (\u00b12,0) is the most error-prone part of the hand count. I checked its pattern symmetry but did not verify the total by a separate method or by code.\n\nANSWER: 522",
+  "ttft_ms": 242485,
+  "type": "result",
+  "duration_ms": 245156,
+  "uuid": "fbefafa5-4691-4994-a642-7195a3df7db1",
+  "ttft_stream_ms": 2490,
+  "time_to_request_ms": 109,
+  "first_content_frame_ms": 2490,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "saw",
+    "run": 5,
+    "wall_s": 250.9,
+    "finished_utc": "2026-10-22T14:22:43+00:00"
+  }
+}

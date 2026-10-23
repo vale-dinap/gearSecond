@@ -1,0 +1,1 @@
+Rust rejects two simultaneous mutable references to the same value because the borrow checker enforces aliasing XOR mutability: a mutable reference must be exclusive, so no other reference can read or write that data while it exists. This prevents data races and iterator invalidation, where one reference changes or frees memory another reference still depends on.

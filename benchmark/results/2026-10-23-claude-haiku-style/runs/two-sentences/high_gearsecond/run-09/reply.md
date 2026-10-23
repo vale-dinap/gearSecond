@@ -1,0 +1,1 @@
+Rust enforces at most one mutable reference, or any number of shared references, to a value at a time, so that no code can modify data while another part of the program is reading or modifying it. This rule, checked at compile time by the borrow checker, prevents data races and aliasing bugs such as iterator invalidation and use-after-free through stale references.

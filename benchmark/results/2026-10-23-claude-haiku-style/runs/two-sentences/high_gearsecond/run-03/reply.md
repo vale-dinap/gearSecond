@@ -1,0 +1,1 @@
+Rust enforces that a value has at most one active `&mut` at a time, so the compiler can reason that nothing else changes the data while a mutable reference is in use. This prevents aliasing bugs such as data races, iterator invalidation (for example, pushing to a `Vec` while holding a reference into it), and dangling references.

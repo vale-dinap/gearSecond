@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 2653,
+  "stop_reason": "end_turn",
+  "session_id": "43b4b4c0-2266-42e7-abc0-1880d5bb3483",
+  "total_cost_usd": 0.0338316,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 3729,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 193,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 3729,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 193,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 3729,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 3729
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 193,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 3729,
+      "webSearchRequests": 0,
+      "costUSD": 0.0338316,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "1. Add a composite index: `CREATE INDEX CONCURRENTLY ON orders (customer_id, created_at DESC);` so Postgres reads the 20 rows in order without sorting.\n2. Replace `SELECT *` with only the columns you need, and add them via `INCLUDE (...)` on that index to enable index-only scans.\n3. Run `VACUUM ANALYZE orders` (and tune autovacuum for this table) so stats are fresh and the planner picks the index, then verify with `EXPLAIN (ANALYZE, BUFFERS)`.",
+  "ttft_ms": 2708,
+  "type": "result",
+  "duration_ms": 2748,
+  "uuid": "3bd41c59-f7c1-48ec-8913-22e04c265de3",
+  "ttft_stream_ms": 2533,
+  "time_to_request_ms": 95,
+  "first_content_frame_ms": 2533,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "numbered-3",
+    "run": 2,
+    "wall_s": 8.7,
+    "finished_utc": "2026-10-22T19:52:03+00:00"
+  }
+}

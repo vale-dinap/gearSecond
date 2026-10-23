@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 1778,
+  "stop_reason": "end_turn",
+  "session_id": "872e6a94-f2fe-45f5-abcf-429b112a745b",
+  "total_cost_usd": 0.0006733900000000001,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 3026,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 123,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 3026,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 123,
+        "cache_read_input_tokens": 649,
+        "cache_creation_input_tokens": 3026,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 3026
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 123,
+      "cacheReadInputTokens": 649,
+      "cacheCreationInputTokens": 3026,
+      "webSearchRequests": 0,
+      "costUSD": 0.0006733900000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "Rust's borrow checker enforces that, at any point, a value has either one mutable reference or any number of shared references, never both, so the compiler can prove statically that no one is modifying data while another part of the code is reading or writing it through a different path. This prevents data races and iterator invalidation, along with the related bugs where a pointer or reference is left dangling after a reallocation or mutation.",
+  "ttft_ms": 1863,
+  "type": "result",
+  "duration_ms": 1879,
+  "uuid": "ca68b74e-31ee-4cf1-acb1-1a8361329ea2",
+  "ttft_stream_ms": 1859,
+  "time_to_request_ms": 99,
+  "first_content_frame_ms": 1860,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high",
+    "problem": "two-sentences",
+    "run": 1,
+    "wall_s": 6.6,
+    "finished_utc": "2026-10-22T19:50:45+00:00"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 37327,
+  "stop_reason": "end_turn",
+  "session_id": "cdef92a2-c078-42d6-9ea2-81a984060c47",
+  "total_cost_usd": 0.00594138,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 10783,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 7556,
+    "output_tokens_details": {
+      "thinking_tokens": 5511
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 10783,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 7556,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 10783,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 10783
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 7556,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 10783,
+      "webSearchRequests": 0,
+      "costUSD": 0.00594138,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 5511,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "The most serious problems are a deadlock, two undefined-behaviour sites reachable from untrusted input, and a `receive` bug that can oversell stock. Ordered by severity:\n\n**Deadlock and concurrency**\n\n- **L259 (`confirm`) vs L245 (`place_hold`) and L272 (`sweep_expired`):** lock order is inconsistent. `place_hold` and `sweep_expired` take `warehouse` then `holds`. `confirm` takes `holds` then `warehouse` (L262, L265). If one thread is in `confirm` holding `holds` while another is in `place_hold` holding `warehouse`, each waits on the other forever. Fix: pick one global order (warehouse, then holds, then next_id) and use it in every method, or put all state behind one mutex.\n- **L253 (`place_hold`):** `Instant::now() + ttl` panics on overflow, for example with `Duration::MAX` from a client. This happens after `wh.reserve` at L246 has already succeeded, so the stock stays reserved with no hold. The panic also poisons the `warehouse` mutex. Use `Instant::now().checked_add(ttl)` and return an error before reserving.\n\n**Undefined behaviour and memory safety**\n\n- **L185 (`SlotTable::lookup`):** `get_unchecked` on a slot index that the doc says comes from a scanner message. Any out-of-range value is an out-of-bounds read. Use `self.slots.get(slot).copied().flatten()`. The hot-path comment does not justify removing the check.\n- **L194\u2013197 (`append_batch`):** `first` is a raw pointer taken before `extend_from_slice(tail)`. That call can reallocate `buf`, so `*first` reads freed memory. The value is just `head`, so return `Some((head, buf.len()))` and drop the pointer entirely.\n- **L218 (`decode`):** `from_utf8_unchecked` runs on bytes from the network. Invalid UTF-8 creates a `String` that violates its invariant, which is UB. Use `std::str::from_utf8(...).map_err(|_| InvError::Malformed(\"bad utf-8\"))?`.\n\n**Panics and integer arithmetic**\n\n- **L157 (`deltas`):** the loop runs `i` over `0..prices.len()` and reads `prices[i + 1]`. On the last iteration that index is `len`, so every non-empty input panics, including a single element. Iterate `prices.windows(2)` or `0..prices.len().saturating_sub(1)`. The `i64` subtraction can also overflow for extreme inputs.\n- **L120 (`record_loss`):** `on_hand -= lost` is unchecked. Losing more than is on hand underflows (panic in debug, wrap in release). The function also never reduces `reserved`, so `on_hand` can fall below `reserved`.\n- **L47 (`available`):** `on_hand - reserved` underflows once `record_loss` breaks the invariant `reserved <= on_hand`. This panics inside `reserve` (L91) and `low_stock` (L132\u2013133). Either make `record_loss` reject losses above `available()`, or use `saturating_sub` here and report the discrepancy.\n- **L112 (`ship`):** `on_hand -= qty` depends on the same invariant, so it underflows once L120 breaks it. Fixing L120 covers this.\n- **L127 (`total_value`):** `on_hand as u64 * price_cents` and the `sum` can overflow `u64` for large prices. Use `checked_mul` and `checked_add`, or document the bound.\n- **L204 (`encode`):** `name.len() as u8` silently truncates names longer than 255 bytes. The length prefix is then wrong and the frame is corrupt. Reject such names with an error.\n- **L144 (`moving_average`):** `assert!` panics on `window == 0` from a public function. The doc comment does not mention this. Return an empty `Vec` or a `Result` instead.\n\n**Logic errors**\n\n- **L80\u201381 (`receive`):** the doc says units are added to an existing SKU, but `insert` replaces the whole item. `on_hand` becomes `qty`, `reserved` becomes 0, and the name and price are overwritten. Active holds stay in the `holds` map while their reservation disappears, so the warehouse can oversell. A later `ship` for those holds then fails with `Insufficient`, after the hold was already removed at L260. Fix: use `entry(sku).or_insert_with(...)` and add `qty` to `on_hand`.\n\nMinor, not blocking: `log` grows without bound, and `parse_command` checks the verb last, so `FOO 1` reports \"bad qty\" rather than \"unknown verb\".\n\nThe test module covers only the happy path. None of the defects above would be caught by it.\n\nISSUES:\n\nL80: receive replaces the existing item, dropping on_hand units, reservations and holds; doc says it adds\n\nL157: deltas indexes prices[i + 1] with i up to len-1, so any non-empty input panics; i64 subtraction can also overflow\n\nL185: get_unchecked on untrusted slot index is an out-of-bounds read (UB)\n\nL194: raw pointer `first` is taken before extend_from_slice, which can reallocate; dereferencing it is use-after-free\n\nL204: name.len() as u8 truncates names over 255 bytes, producing a corrupt frame\n\nL218: from_utf8_unchecked on network bytes creates an invalid String (UB)\n\nL253: Instant::now() + ttl can panic after stock is reserved, leaking the reservation and poisoning the warehouse mutex\n\nL259: confirm takes holds then warehouse, while place_hold and sweep_expired take warehouse then holds; lock-order inversion can deadlock\n\nL47: available() underflows once reserved exceeds on_hand, panicking reserve and low_stock\n\nL120: record_loss subtracts without checking, underflowing on_hand and breaking reserved <= on_hand\n\nL127: total_value multiplication and sum can overflow u64 for large prices\n\nL144: moving_average asserts on window == 0 in a public API",
+  "ttft_ms": 29022,
+  "type": "result",
+  "duration_ms": 37373,
+  "uuid": "378c3f29-1a6d-4a1c-9eaf-8c93184aebf5",
+  "ttft_stream_ms": 3228,
+  "time_to_request_ms": 41,
+  "first_content_frame_ms": 3228,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "lib.rs",
+    "run": 5,
+    "wall_s": 40.0,
+    "finished_utc": "2026-10-22T14:03:54+00:00"
+  }
+}

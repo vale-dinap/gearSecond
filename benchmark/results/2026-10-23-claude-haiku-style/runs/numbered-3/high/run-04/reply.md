@@ -1,0 +1,3 @@
+1. Add a composite index on `orders (customer_id, created_at DESC)` so Postgres can filter and return the newest 20 rows directly from the index.
+2. Run `EXPLAIN (ANALYZE, BUFFERS)` on the query to confirm it uses an Index Scan (not a Seq Scan or a top-N sort over many rows) after adding the index.
+3. Consider partitioning `orders` by `created_at` (range partitions, e.g. monthly) so queries touching recent data scan far fewer rows, and run `VACUUM ANALYZE` after bulk loads so the planner has current statistics.

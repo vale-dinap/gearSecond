@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 15110,
+  "stop_reason": "end_turn",
+  "session_id": "40d44dc3-bbd5-488c-a014-08c2c3d7306e",
+  "total_cost_usd": 0.0440738,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 2252,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 1296,
+    "output_tokens_details": {
+      "thinking_tokens": 22
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 2252,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1296,
+        "cache_read_input_tokens": 649,
+        "cache_creation_input_tokens": 2252,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2252
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 1296,
+      "cacheReadInputTokens": 649,
+      "cacheCreationInputTokens": 2252,
+      "webSearchRequests": 0,
+      "costUSD": 0.0440738,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 22,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "## Why immediate retries made the outage worse\n\n**1. Load amplification.** Each failing request becomes up to 6 requests (1 original + 5 retries). When the dependency is already struggling, its inbound traffic suddenly multiplies by as much as 6\u00d7, exactly when it has the least capacity. If there are multiple layers that each retry (A \u2192 B \u2192 C, each with 5 retries), the multiplication compounds: 6 \u00d7 6 = 36\u00d7 at the bottom.\n\n**2. No recovery window.** Retrying *immediately* gives the dependency no time to shed load, restart, drain queues, or let autoscaling catch up. Every time it frees capacity, the retry flood consumes it again. This is how a brief blip turns into a sustained outage, sometimes called a **retry storm**.\n\n**3. Synchronization.** When the dependency fails, every client sees the failure at about the same moment and retries at about the same moment. These synchronized waves hit the recovering service in spikes, a \"thundering herd,\" instead of a smooth load it might be able to handle.\n\n**4. Retrying the unretryable.** If the policy retries on every failure, it also retries errors that will never succeed (400s, auth failures) or that explicitly mean \"back off\" (429, 503 with `Retry-After`). That is wasted load at best, and it ignores the server's own request to slow down.\n\n**5. Self-inflicted resource exhaustion.** The calling service holds threads, connections, and memory while it loops through retries. Latency grows, its own callers time out, and *they* retry. The failure spreads upstream.\n\n## A better retry policy\n\n**Exponential backoff with jitter.** Space out the attempts and randomize the delays:\n\n```\ndelay = random(0, min(cap, base * 2^attempt))   # \"full jitter\"\n```\n\nFor example, base = 100 ms and cap = 10\u201320 s. The backoff gives the dependency room to recover, and the jitter breaks up synchronized waves.\n\n**Fewer attempts.** Make 2\u20133 retries, not 5. Most transient failures clear on the first retry. Beyond that you are mostly adding load.\n\n**Retry only retryable failures.**\n- Retry on connection errors, timeouts, 502/503/504, and 429.\n- Never retry other 4xx errors.\n- Honor `Retry-After` headers.\n- Only retry non-idempotent operations (POST, payments, etc.) if you use idempotency keys.\n\n**A retry budget.** Cap retries as a fraction of total traffic, for example at most 10% extra requests per client, using a token bucket. When many calls fail, retries are automatically throttled. This bounds amplification to about 1.1\u00d7 instead of 6\u00d7.\n\n**A circuit breaker.** After the failure rate crosses a threshold, stop calling the dependency for a cooldown period and fail fast or serve a fallback. Then let a few probe requests through (half-open) before resuming fully. This is what really protects a dependency that is down, as opposed to one that is flaky.\n\n**Retry at one layer only.** In a call chain, let a single layer (usually the edge or the caller closest to the user) own retries. Inner layers fail fast. This prevents multiplicative amplification.\n\n**An overall deadline.** Bound the total time, including all retries, by the caller's deadline, and propagate deadlines downstream. Never retry if the result will arrive after the caller has given up.\n\n### Summary\n\n> Up to 3 attempts total, exponential backoff with full jitter (100 ms base, ~10 s cap), only on transient errors and idempotent requests, honoring `Retry-After`, constrained by a ~10% retry budget, behind a circuit breaker, within an overall request deadline.\n\nThe general principle: retries are a tool for handling **transient, isolated** failures. During a **systemic** failure they must back off or shut off, or they become a load generator aimed at the component least able to absorb it.",
+  "ttft_ms": 2163,
+  "type": "result",
+  "duration_ms": 15183,
+  "uuid": "11d984c6-38af-4e9a-b0dd-ebef2debb932",
+  "ttft_stream_ms": 2162,
+  "time_to_request_ms": 71,
+  "first_content_frame_ms": 2162,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high",
+    "problem": "default",
+    "run": 3,
+    "wall_s": 18.7,
+    "finished_utc": "2026-10-22T19:52:22+00:00"
+  }
+}

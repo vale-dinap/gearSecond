@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 24781,
+  "stop_reason": "end_turn",
+  "session_id": "5443383c-f237-4858-9a53-ad3d27bfde7e",
+  "total_cost_usd": 0.0047875800000000005,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 10779,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 5250,
+    "output_tokens_details": {
+      "thinking_tokens": 3441
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 10779,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 5250,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 10779,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 10779
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 5250,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 10779,
+      "webSearchRequests": 0,
+      "costUSD": 0.0047875800000000005,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 3441,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "The review is by reading only; I did not compile or run the code or the tests. Defects are grouped by category, most severe first.\n\n**Undefined behaviour (`unsafe`)**\n\n- **`lookup`, line 185:** `get_unchecked(slot)` takes `slot` from a scanner message. Any `slot >= slots.len()` is out-of-bounds UB. Use `self.slots.get(slot).copied().flatten()`, which needs no `unsafe`.\n- **`append_batch`, lines 194-196:** `first` is a raw pointer into `buf`, taken before `extend_from_slice`. That call can reallocate, leaving `first` dangling, so the read at 196 is use-after-free. The pointer is also unnecessary: return `buf[start]` after the extend, or `head` directly.\n- **`decode`, line 218:** `from_utf8_unchecked` runs on bytes from the network. Invalid UTF-8 there is UB. Use `std::str::from_utf8(...).map_err(|_| InvError::Malformed(\"bad utf-8\"))?`.\n\n**Panics**\n\n- **`deltas`, lines 156-157:** the loop runs `i` over `0..len` and reads `prices[i + 1]`, so the last iteration indexes past the end. Any non-empty input panics; a single-element slice panics immediately. The loop should be `0..prices.len().saturating_sub(1)`, or use `windows(2)`. The subtraction at 157 can also overflow `i64` for extreme values; use `checked_sub` or `wrapping_sub` deliberately.\n- **`record_loss`, line 120:** `on_hand -= lost` is not checked, so it panics in debug and wraps in release. Losing more than `on_hand` is reachable, and it is never rejected.\n\n**Integer overflow and invariant breaks**\n\n- **`record_loss`, line 120 (continued):** it never checks `lost <= on_hand` or `on_hand - lost >= reserved`. After a loss, `on_hand < reserved` is possible. `available()` at line 47 then underflows (`on_hand - reserved`), which panics in debug and yields a huge value in release. That value makes `reserve` accept any quantity. Reject losses that would drop `on_hand` below `reserved`.\n- **`receive`, lines 79-82:** the doc says units are added to existing stock, but `insert` replaces the item and resets `reserved` to 0 (line 80). Outstanding holds then no longer match the reserved count, so stock can be oversold and a later `confirm` can ship units that belong to other holds. Fix: add to `on_hand` when the SKU exists, and keep `reserved`.\n- **`total_value`, line 127:** `on_hand as u64 * price_cents` and the `sum()` can overflow `u64`. Panics in debug, wraps silently in release. Use `checked_mul` and `checked_add`, or `u128`.\n- **`encode`, line 204:** `name.len() as u8` truncates names longer than 255 bytes. The length prefix then disagrees with the payload and the record is corrupted. Reject names over 255 bytes instead of truncating.\n\n**Concurrency**\n\n- **Lock-order inversion (`place_hold` lines 245-247 vs `confirm` lines 259-265, and `sweep_expired` 272-273):** `place_hold` and `sweep_expired` take `warehouse` then `holds`; `confirm` takes `holds` then `warehouse`. Two threads can each hold one lock and wait for the other: deadlock. Pick one order everywhere.\n\n**Logic**\n\n- **`confirm`, lines 260-266:** the hold is removed from the map before `ship` runs. If `ship` fails (for example, after the `receive` reset above), the hold is gone but its reservation is never released, and that stock stays reserved forever. Look up the hold, perform the ship, and only remove it on success, or release the reservation on failure.\n\nNothing else stood out as a real defect. `moving_average`, `SlotTable::assign`, `parse_command` and `Service::snapshot` look correct as written.\n\nISSUES:\nL47: available() underflows when reserved > on_hand (reachable via record_loss); panic in debug, wrap in release\nL80-81: receive() replaces existing item, resetting reserved to 0 while holds are outstanding; doc says units are added\nL120: record_loss() does not check lost <= on_hand or on_hand >= reserved; can panic/underflow and break reserved <= on_hand\nL127: total_value() u32*u64 product and u64 sum can overflow silently in release\nL157: deltas() indexes prices[i + 1] with i up to len-1: out-of-bounds panic for any non-empty input; i64 subtraction can overflow\nL185: lookup() uses get_unchecked on scanner-supplied slot: out-of-bounds undefined behaviour\nL196: append_batch() reads through pointer taken before extend_from_slice, which can reallocate: use-after-free\nL204: encode() truncates name length to u8 for names over 255 bytes: corrupt record\nL218: decode() uses from_utf8_unchecked on network bytes: undefined behaviour on invalid UTF-8\nL247: place_hold() locks warehouse then holds; confirm() (L259-265) locks holds then warehouse: deadlock\nL266: confirm() removes hold before ship(); on ship failure the reservation is leaked permanently",
+  "ttft_ms": 17257,
+  "type": "result",
+  "duration_ms": 24842,
+  "uuid": "9b38beb6-667d-44aa-b1e6-ef6974349234",
+  "ttft_stream_ms": 2860,
+  "time_to_request_ms": 58,
+  "first_content_frame_ms": 2860,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "lib.rs",
+    "run": 25,
+    "wall_s": 30.9,
+    "finished_utc": "2026-10-22T14:02:28+00:00"
+  }
+}

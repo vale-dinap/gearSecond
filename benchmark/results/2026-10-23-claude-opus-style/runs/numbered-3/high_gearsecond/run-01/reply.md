@@ -1,0 +1,3 @@
+1. Create a composite index `CREATE INDEX CONCURRENTLY idx_orders_customer_created ON orders (customer_id, created_at DESC);` so Postgres can read the 20 newest rows for a customer straight from the index without sorting.
+2. Replace `SELECT *` with only the columns you need, and consider `INCLUDE (...)` on that index so the query becomes an index-only scan.
+3. Run `EXPLAIN (ANALYZE, BUFFERS)` to confirm the index is used, and `VACUUM ANALYZE orders` (or tune autovacuum) so statistics and the visibility map stay current at 50M rows.

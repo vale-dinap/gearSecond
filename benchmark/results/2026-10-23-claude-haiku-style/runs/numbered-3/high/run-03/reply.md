@@ -1,0 +1,3 @@
+1. Add a composite index on `orders (customer_id, created_at DESC)` so Postgres can read the 20 newest rows for a customer directly from the index without sorting.
+2. Run `EXPLAIN (ANALYZE, BUFFERS)` on the query to confirm the planner uses an Index Scan and no longer does a full sort or sequential scan.
+3. Keep the table's statistics current with `ANALYZE orders` (or tune autovacuum) so the planner keeps choosing the composite index as the table grows.

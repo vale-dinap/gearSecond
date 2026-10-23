@@ -1,0 +1,3 @@
+1. Add a composite index on `orders (customer_id, created_at DESC)` so the filter and sort are served by one index scan.
+2. Run `EXPLAIN (ANALYZE, BUFFERS)` to confirm the plan uses that index with no sort node and no full scan.
+3. If the table is partitioned by `created_at` or `customer_id`, check that the query can prune partitions, and consider `CLUSTER`/`pg_repack` or a covering index with `INCLUDE` if rows are still fetched from heap.

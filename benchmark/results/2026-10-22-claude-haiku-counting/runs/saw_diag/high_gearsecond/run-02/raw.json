@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 307997,
+  "stop_reason": "end_turn",
+  "session_id": "592d543c-37b8-43b4-801f-eaf04577d22e",
+  "total_cost_usd": 0.03861168,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4537,
+    "cache_read_input_tokens": 658,
+    "output_tokens": 75395,
+    "output_tokens_details": {
+      "thinking_tokens": 74864
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 4537,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 75395,
+        "cache_read_input_tokens": 658,
+        "cache_creation_input_tokens": 4537,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 4537
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 75395,
+      "cacheReadInputTokens": 658,
+      "cacheCreationInputTokens": 4537,
+      "webSearchRequests": 0,
+      "costUSD": 0.03861168,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 74864,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "The count is **756**, found by hand case analysis (no code). Walks of length 8 can only end at (a,a) with |a| \u2264 4, and (0,0) is impossible because a self-avoiding walk cannot return to the origin.\n\nBy the symmetry (x,y) \u2192 (\u2212x,\u2212y), the counts for a and \u2212a are equal. Let N_a be the number of walks ending at (a,a):\n\n- **N\u2084 = 70.** All 8 steps must be 4 E and 4 N, so the walk is monotone: C(8,4) = 70.\n- **N\u2083 = 120.** Two step-type cases (one extra W, or one extra S), each giving 60 by a row-by-row argument, so 2 \u00d7 60.\n- **N\u2082 = 112.** Split by the number of extra W and S steps: (2 W, 0 S) gives 18, (0 W, 2 S) gives 18, and (1 W, 1 S) gives 76.\n- **N\u2081 = 76.** Cases with 3 extra horizontal/vertical reversals: (3 W, 0 S) gives 2, (0 W, 3 S) gives 2, and (2 W, 1 S) and (1 W, 2 S) each give 36.\n- **N\u2080 = 0.**\n\nThe total is 2 \u00d7 (76 + 112 + 120 + 70) = 2 \u00d7 378 = 756.\n\nThe two most error-prone counts (the (1 W, 1 S) case for N\u2082 and the (2 W, 1 S) case for N\u2081) were checked by reversal symmetry, which maps the vertical-order subcases onto each other with matching counts.\n\nANSWER: 756",
+  "ttft_ms": 306390,
+  "type": "result",
+  "duration_ms": 308064,
+  "uuid": "7e333f3a-8051-4c40-b44b-664a83898a49",
+  "ttft_stream_ms": 3212,
+  "time_to_request_ms": 55,
+  "first_content_frame_ms": 3213,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high+gearsecond",
+    "problem": "saw_diag",
+    "run": 2,
+    "wall_s": 311.1,
+    "finished_utc": "2026-10-22T14:47:19+00:00"
+  }
+}

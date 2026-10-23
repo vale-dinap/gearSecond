@@ -1,0 +1,3 @@
+1. Add a composite index on `orders (customer_id, created_at DESC)` so Postgres can read the 20 newest rows for a customer directly from the index.
+2. Run `EXPLAIN (ANALYZE, BUFFERS)` on the query to confirm the plan uses an Index Scan (not a Seq Scan or a big sort), and that the index was built with `CREATE INDEX CONCURRENTLY` to avoid locking writes.
+3. If the table keeps growing, partition `orders` by `created_at` (range) or by a hash of `customer_id`, and run `VACUUM ANALYZE` so the planner has current statistics.

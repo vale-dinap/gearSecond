@@ -1,0 +1,1 @@
+Rust enforces aliasing XOR mutability: a value can have either one mutable reference or any number of shared references at a time, never both. This rules out data races and iterator or pointer invalidation, where one reference changes or frees data another reference is still reading.

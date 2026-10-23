@@ -1,0 +1,3 @@
+1. Add a composite index on `orders (customer_id, created_at DESC)` so Postgres can read the 20 newest rows for a customer directly from the index without sorting.
+2. Run `EXPLAIN (ANALYZE, BUFFERS)` on the query to confirm the plan uses an Index Scan and not a Seq Scan or a top-N sort over many rows.
+3. If the table keeps growing, partition `orders` by `created_at` (range partitioning) and keep the composite index on each partition so old data stays out of the hot path.

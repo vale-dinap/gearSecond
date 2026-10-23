@@ -1,0 +1,176 @@
+{
+  "manifest": {
+    "task": "counting",
+    "model": "claude-haiku-5-5",
+    "arms": [
+      "high",
+      "high+gearsecond"
+    ],
+    "runs_per_arm": 5,
+    "problems": {
+      "saw": "441b1d0c38b9597f4e0d378b8c8ed99a651363849013a47cefb61b21da1e393e",
+      "saw_diag": "99333dee234350b8984a974b02ca1bd3bc527948e748170cff3844088afe4e90",
+      "saw_quad": "cfadfb6876198ab56e7c8c88a103ad76eecba7d493382f840535f4cef3f7c93f"
+    },
+    "skills": {
+      "gearsecond": {
+        "sha256": "2390d40b200fa377330a13bb77450fa8d2f66c46580fae80c8419aa8adad0c8f",
+        "file": "skill-gearsecond.md",
+        "source": "plugins/gearsecond/skills/gearsecond/SKILL.md"
+      }
+    },
+    "cli_args": {
+      "high": [
+        "claude",
+        "-p",
+        "--output-format",
+        "json",
+        "--model",
+        "claude-haiku-5-5",
+        "--effort",
+        "high",
+        "--tools",
+        "",
+        "--strict-mcp-config",
+        "--setting-sources",
+        "",
+        "--no-session-persistence",
+        "--append-system-prompt-file",
+        "<problem system text, if any>"
+      ],
+      "high+gearsecond": [
+        "claude",
+        "-p",
+        "--output-format",
+        "json",
+        "--model",
+        "claude-haiku-5-5",
+        "--effort",
+        "high",
+        "--tools",
+        "",
+        "--strict-mcp-config",
+        "--setting-sources",
+        "",
+        "--no-session-persistence",
+        "--append-system-prompt-file",
+        "<problem system text, then skill-gearsecond.md>"
+      ]
+    },
+    "isolation": "no tools, no MCP, no settings sources, fresh empty cwd per run",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.2",
+    "runner_sha256": "3f890210d6c6397ce42a404f5eebac88a661e639e21e33d92f64bd2937a428d6",
+    "bench_sha256": "9011b01161a17dd78ed0363a125bdefe49fee8ef6b3fba91401fde0759f4b2ec",
+    "started_utc": "2026-10-22T14:18:32+00:00",
+    "finished_utc": "2026-10-22T18:05:28+00:00",
+    "cli": "claude",
+    "cli_version": "2.1.308",
+    "note": "Run while the skill was still a draft under another name; its text is byte-identical to the shipped SKILL.md body (same sha256). Arms for other drafts were removed from this published copy."
+  },
+  "cells": [
+    {
+      "problem": "saw",
+      "arm": "high",
+      "runs": 5,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        82428,
+        80949,
+        90581,
+        78145,
+        82143
+      ],
+      "cost_total": 0.21204041999999998
+    },
+    {
+      "problem": "saw",
+      "arm": "high+gearsecond",
+      "runs": 5,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        65690,
+        111075,
+        70624,
+        70284,
+        56634
+      ],
+      "cost_total": 0.19302402999999999
+    },
+    {
+      "problem": "saw_diag",
+      "arm": "high",
+      "runs": 5,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        214718,
+        95132,
+        74983,
+        94354,
+        114753
+      ],
+      "cost_total": 0.30230485
+    },
+    {
+      "problem": "saw_diag",
+      "arm": "high+gearsecond",
+      "runs": 5,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        60451,
+        74864,
+        74402,
+        82870,
+        59718
+      ],
+      "cost_total": 0.182338
+    },
+    {
+      "problem": "saw_quad",
+      "arm": "high",
+      "runs": 5,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        97044,
+        98312,
+        57079,
+        58871,
+        91997
+      ],
+      "cost_total": 0.20666344999999997
+    },
+    {
+      "problem": "saw_quad",
+      "arm": "high+gearsecond",
+      "runs": 5,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        55024,
+        47722,
+        54911,
+        65778,
+        84248
+      ],
+      "cost_total": 0.15974329999999998
+    }
+  ],
+  "comparisons": [
+    {
+      "arm": "high+gearsecond",
+      "baseline": "high",
+      "thinking_change": -0.2672312713737053,
+      "ci95": [
+        -0.39958803913080276,
+        -0.11769879266855054
+      ],
+      "p": 0.004999500049995001,
+      "quality_change": 0.0
+    }
+  ]
+}

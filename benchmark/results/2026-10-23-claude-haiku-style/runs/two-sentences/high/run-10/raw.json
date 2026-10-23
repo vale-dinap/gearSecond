@@ -1,0 +1,106 @@
+{
+  "duration_api_ms": 1357,
+  "stop_reason": "end_turn",
+  "session_id": "ea5ba050-0f2e-476f-a559-61a52a442439",
+  "total_cost_usd": 0.0006689900000000001,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 3024,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 115,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 3024,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 115,
+        "cache_read_input_tokens": 649,
+        "cache_creation_input_tokens": 3024,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 3024
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "modelUsage": {
+    "claude-haiku-5-5": {
+      "inputTokens": 2,
+      "outputTokens": 115,
+      "cacheReadInputTokens": 649,
+      "cacheCreationInputTokens": 3024,
+      "webSearchRequests": 0,
+      "costUSD": 0.0006689900000000001,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-haiku-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "safety_stops": 0,
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "Rust enforces that a value has either one mutable reference or any number of shared references at a time, because allowing aliased mutation would let one part of the code change data out from under another that is still reading or writing it. This prevents data races and iterator/reference invalidation bugs, such as a pointer into a `Vec` becoming dangling after a push reallocates the buffer.",
+  "ttft_ms": 1399,
+  "type": "result",
+  "duration_ms": 1415,
+  "uuid": "237a182e-0d0e-466d-bb15-a95b54e3a83f",
+  "ttft_stream_ms": 1397,
+  "time_to_request_ms": 52,
+  "first_content_frame_ms": 1397,
+  "queued_turn_count": 0,
+  "result_index": 0,
+  "runner": {
+    "arm": "high",
+    "problem": "two-sentences",
+    "run": 10,
+    "wall_s": 5.6,
+    "finished_utc": "2026-10-22T19:51:49+00:00"
+  }
+}
