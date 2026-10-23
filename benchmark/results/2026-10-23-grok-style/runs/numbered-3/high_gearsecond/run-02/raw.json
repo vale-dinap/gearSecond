@@ -1,0 +1,36 @@
+{
+  "text": "1. Add a composite index on `(customer_id, created_at DESC)` so Postgres can filter, order, and stop after 20 rows in one index scan.\n2. Replace `SELECT *` with only the columns you need, and include those columns in the index if you want an index-only scan.\n3. Confirm with `EXPLAIN (ANALYZE, BUFFERS)` that the plan is an index scan plus Limit, and run `ANALYZE orders` if the planner\u2019s row estimates are stale.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16545-564c-7141-837f-922b0829bfdc",
+  "requestId": "7ea2c95a-abb6-4f27-8c9b-d4b4ca827fad",
+  "thought": "Preparing three concise one-line suggestions to optimize the slow Postgres query on a 50 million row table.\n\nA composite index on (customer_id, created_at DESC) is the first suggestion. It would let Postgres satisfy the filter, sort, and limit from the index alone. The second is to avoid SELECT * and instead request only needed columns. The third is to check cardinality with ANALYZE or use keyset pagination.",
+  "usage": {
+    "input_tokens": 14363,
+    "cache_read_input_tokens": 1664,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 579,
+    "reasoning_tokens": 476,
+    "total_tokens": 16606
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.01123088,
+  "total_cost_usd_ticks": 112308800,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 14363,
+      "outputTokens": 579,
+      "cacheReadInputTokens": 1664,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.01123088
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high+gearsecond",
+    "problem": "numbered-3",
+    "run": 2,
+    "wall_s": 9.8,
+    "finished_utc": "2026-10-22T20:20:14+00:00"
+  }
+}

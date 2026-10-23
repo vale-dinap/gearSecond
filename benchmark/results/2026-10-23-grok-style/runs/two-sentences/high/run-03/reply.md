@@ -1,0 +1,1 @@
+Rust allows only one mutable reference at a time so mutation stays exclusive and no other reference can read or write the same value while it changes. That rule prevents data races, the class of bugs where unsynchronized shared access includes at least one write and leads to undefined behavior.

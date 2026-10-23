@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries turned a dependency outage into a larger one by multiplying load on a service that was already failing.\n\nEach failed call became up to five calls in a row, with no pause. While the dependency was slow or down, those extra attempts piled onto the same saturated threads, connection pools, and queues. Callers that failed together retried together, so the spikes lined up. Each attempt also held a connection until it timed out, so in-flight work and tail latency grew with every retry. The dependency never got a quiet interval in which to recover, and the failure spread upstream.\n\nUse a bounded retry policy with exponential backoff and jitter, and stop calling altogether when the dependency is clearly down.\n\n- Retry only transient failures: connection errors, timeouts, `429`, `502`, `503`, and `504`. Honor `Retry-After` when the server sends it.\n- Wait between attempts. A typical schedule is about 100 ms, 200 ms, 400 ms, 800 ms, then stop, with full jitter so clients do not retry on the same tick. Cap the delay and the number of attempts (often 2\u20133, inside one overall deadline).\n- Keep a retry budget, for example retries as a small fraction of normal traffic, so retries cannot multiply load by five.\n- Open a circuit breaker after repeated failures and fail fast until a probe succeeds.\n- Send an idempotency key on any non-safe method so a retried call does not apply twice.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16545-c752-7f33-96fc-690eda44557e",
+  "requestId": "9f35ecd9-a9d8-40fa-9793-63ea1be18763",
+  "thought": "Immediate retries amplify dependency outages by generating burst traffic and exhausting resources. A better policy uses exponential backoff with jitter to spread requests over time.\n\nA retry storm is a thundering herd. Every client fires five requests at once. That multiplies load on the failing service. Partially degraded dependencies hold connections longer. Retries multiply in-flight work.\n\nImmediate retries leave no recovery window. The dependency stays saturated while retrying clients pile on. Correlated failures at the same instant create synchronized load spikes. Retrying 4xx errors or lost responses risks duplicate side effects.\n\nFive immediate retries stack timeouts and hold resources longer. That cascades upstream.\n\nA robust policy caps retries and maximum delay. It retries only transient failures such as 429, 502, 503, 504, connection resets, or timeouts. It ignores 4xx client errors. It honors Retry-After headers. A circuit breaker stops calls to clearly down dependencies.",
+  "usage": {
+    "input_tokens": 6009,
+    "cache_read_input_tokens": 8960,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 824,
+    "reasoning_tokens": 520,
+    "total_tokens": 15793
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.00729028,
+  "total_cost_usd_ticks": 72902800,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6009,
+      "outputTokens": 824,
+      "cacheReadInputTokens": 8960,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.00729028
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high",
+    "problem": "default",
+    "run": 10,
+    "wall_s": 16.6,
+    "finished_utc": "2026-10-22T20:20:50+00:00"
+  }
+}

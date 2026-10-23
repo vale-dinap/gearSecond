@@ -1,0 +1,1 @@
+Rust allows only one mutable reference to a value at a time so that a write is exclusive: nothing else can read or write that memory while the reference exists. That rule prevents data races, where two or more accesses touch the same data at once, at least one of them writes, and there is no synchronization.

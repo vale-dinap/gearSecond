@@ -1,0 +1,67 @@
+{
+  "task": "rust-review",
+  "cli": "grok",
+  "cli_version": "1.0.67",
+  "model": "grok-4.7",
+  "arms": [
+    "high",
+    "high+gearsecond"
+  ],
+  "runs_per_arm": 10,
+  "problems": {
+    "lib.rs": "4d640c39d60c7a14c55793d093004cb1b9cf168c67e7a3f46f8ef69cd7631fea"
+  },
+  "skills": {
+    "gearsecond": {
+      "sha256": "2390d40b200fa377330a13bb77450fa8d2f66c46580fae80c8419aa8adad0c8f",
+      "file": "skill-gearsecond.md",
+      "source": "plugins/gearsecond/skills/gearsecond/SKILL.md"
+    }
+  },
+  "cli_args": {
+    "high": [
+      "grok",
+      "--prompt-file",
+      "<prompt.txt>",
+      "--output-format",
+      "json",
+      "-m",
+      "grok-4.7",
+      "--reasoning-effort",
+      "high",
+      "--tools",
+      "",
+      "--disable-web-search",
+      "--no-subagents",
+      "--no-plan",
+      "--max-turns",
+      "5"
+    ],
+    "high+gearsecond": [
+      "grok",
+      "--prompt-file",
+      "<prompt.txt>",
+      "--output-format",
+      "json",
+      "-m",
+      "grok-4.7",
+      "--reasoning-effort",
+      "high",
+      "--tools",
+      "",
+      "--disable-web-search",
+      "--no-subagents",
+      "--no-plan",
+      "--max-turns",
+      "5",
+      "<appended: problem system text, then skill-gearsecond.md>"
+    ]
+  },
+  "isolation": "no tools, no web search, no subagents, no plan mode, at most 5 turns (Grok sometimes writes a preamble turn first), empty HOME so ~/.claude skills/plugins/CLAUDE.md aren't picked up (GROK_HOME keeps the login), fresh empty cwd per run",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.2",
+  "runner_sha256": "d182a15be990a8f31df4ab9f36e989877f1f5197f8874dde095beef0498378e8",
+  "bench_sha256": "70c56158c45a4d7d2895d01fb833db72753f0084e601b83fd064e09064393afa",
+  "started_utc": "2026-10-22T21:31:57+00:00",
+  "finished_utc": "2026-10-22T22:02:27+00:00"
+}

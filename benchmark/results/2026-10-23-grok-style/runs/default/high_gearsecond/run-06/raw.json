@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries multiply load on a dependency that is already failing, so the outage lasts longer and spreads.\n\n## Why it makes the outage worse\n\nEach caller request becomes up to six calls (the original plus five retries) with no pause between them. While the dependency is down or overloaded, that extra traffic does not help. It consumes the dependency\u2019s remaining connections, threads, and CPU, and it fills its queues.\n\nCallers pay the same cost. Threads and connection pools stay busy on calls that will fail, so the service slows down for work that does not even need that dependency.\n\nWhen the dependency starts to recover, every caller retries at once. That synchronized burst can knock it over again. A short blip becomes a longer outage, and the failure cascades upstream.\n\nRetries also fire on errors that will not succeed on the next try (most 4xx responses, bad payloads). Those attempts only add load.\n\n## Policy to use instead\n\nRetry only transient failures: connection errors, timeouts, HTTP 429, and 503. Skip other 4xx responses. Retry only idempotent calls, or send an idempotency key.\n\nUse exponential backoff with full jitter, and cap both the number of attempts and the total time:\n\n- Attempt 1: no delay\n- Later attempts: wait `random(0, min(cap, base * 2^attempt))`, for example base 100 ms, cap 2\u20135 s, at most 3 retries\n- Stop when a deadline or retry budget is exhausted\n- If the response has `Retry-After`, wait at least that long\n\nAdd a circuit breaker. After a run of failures, open the circuit and fail fast for a cool-down period instead of calling the dependency. Probe with a few requests before closing it again. Limit concurrent in-flight calls (a bulkhead) so one dependency cannot exhaust the process.\n\nThe dependency then sees a smaller, spread-out load and has room to recover. Callers fail quickly when it is down, and they come back gradually when it returns.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16545-b140-7dd1-8b0e-6df8f476f41a",
+  "requestId": "d8853188-debb-41e2-83e7-76872bcd1d11",
+  "thought": "Immediate retries during a dependency outage amplify the problem by generating more traffic and pressure on the failing service. A better approach is to use exponential backoff with jitter, which spreads out retry attempts and gives the downstream system time to recover.\n\nEach failed request spawns up to six attempts, compounding the load on the failing dependency. Without backoff, the downstream service never gets breathing room to recover.",
+  "usage": {
+    "input_tokens": 14488,
+    "cache_read_input_tokens": 1536,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 746,
+    "reasoning_tokens": 326,
+    "total_tokens": 16770
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.0116348,
+  "total_cost_usd_ticks": 116348000,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 14488,
+      "outputTokens": 746,
+      "cacheReadInputTokens": 1536,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.0116348
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high+gearsecond",
+    "problem": "default",
+    "run": 6,
+    "wall_s": 15.5,
+    "finished_utc": "2026-10-22T20:20:43+00:00"
+  }
+}

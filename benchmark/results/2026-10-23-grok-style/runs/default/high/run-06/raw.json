@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries multiplied the load on a dependency that was already failing, so it could not recover.\n\nEach user request became up to six calls (the original plus five retries). During the outage those calls failed fast and were reissued at once, so traffic to the dependency jumped by as much as 6\u00d7. Every client hit the same failure at the same moment and retried together, which produced synchronized bursts instead of a pause. The dependency stayed saturated: connection queues, thread pools, and CPU never had a quiet interval in which to drain and come back.\n\nThe caller suffered too. Each attempt held a connection, a thread, or a request slot until it failed. Six back-to-back attempts stretched that hold and exhausted the caller\u2019s pools, so latency and failures spread upstream even for work that did not need the sick dependency.\n\nUse a policy that retries rarely, waits longer between tries, and stops calling once the dependency is clearly down:\n\n- **Retry only transient failures.** Retry timeouts, connection errors, and 408, 429, and 5xx responses that mean \u201ctry later.\u201d Do not retry other 4xx responses. Retry a non-idempotent call only when it carries an idempotency key.\n- **Exponential backoff with full jitter.** For example, wait `random(0, min(cap, base * 2^attempt))` \u2014 something like 100 ms base, 2\u20133 s cap \u2014 so clients do not retry in lockstep. If the response has `Retry-After`, wait at least that long.\n- **Small attempt budget and a hard deadline.** Allow about two or three attempts, and abandon the call when the overall deadline is hit even if attempts remain. That caps amplification at roughly 2\u20133\u00d7 and bounds how long resources stay occupied.\n- **Circuit breaker.** After a run of failures or a high error rate, open the circuit and fail fast for a cooldown (tens of seconds). Then allow a few probe requests. While the circuit is open, send no retries.\n- **Cap in-flight work.** Limit concurrent calls and retries to that dependency (a bulkhead) so a sick dependency cannot consume the whole process.\n\nTogether, backoff spreads the remaining retries, the deadline and attempt cap bound the extra load, and the circuit breaker removes that load for the rest of the outage so the dependency can recover.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16546-d8f6-7443-846b-8b043b590c92",
+  "requestId": "23850cbf-a297-416f-9559-3ee076bc39c0",
+  "thought": "I need to explain why immediate retries up to 5 times worsen dependency outages, and suggest a better retry policy.\n\nImmediate retries create a retry storm. Each failed request becomes six attempts, multiplying load on an already overloaded dependency by up to six times.\n\nNo backoff leaves no breathing room for the dependency to recover. A synchronized thundering herd compounds the problem: many clients retry simultaneously, and identical backoff schedules without jitter cause them to hit the dependency in waves.\n\nRetrying 4xx errors wastes capacity and non-idempotent requests risk duplicate side effects. The caller also suffers resource exhaustion from threads and connections held during retries, spiking its own latency and cascading failure upstream. Stacking full timeouts across attempts exhausts connection pools.\n\nA better policy uses exponential backoff with jitter to spread retries in time and avoid synchronization. Limit retries to two or three attempts and enforce a total time budget so the caller does not waste unbounded time. Retry only transient failures such as 429, 503, 502, 504, connection resets, and timeouts. Do not retry client errors like 400, 401, 403, or 404. Honor Retry-After headers when retrying 429 responses.\n\nA circuit breaker should open after a threshold of failures, fail fast, and probe the dependency with a few requests before closing. This stops retry amplification during sustained outages.\n\nLoad shedding and concurrency limits should cap in-flight requests and retries to prevent the caller from exhausting its own resources.",
+  "usage": {
+    "input_tokens": 12668,
+    "cache_read_input_tokens": 2304,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 1363,
+    "reasoning_tokens": 881,
+    "total_tokens": 16335
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.01178644,
+  "total_cost_usd_ticks": 117864400,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 12668,
+      "outputTokens": 1363,
+      "cacheReadInputTokens": 2304,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.01178644
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high",
+    "problem": "default",
+    "run": 6,
+    "wall_s": 24.7,
+    "finished_utc": "2026-10-22T20:22:08+00:00"
+  }
+}

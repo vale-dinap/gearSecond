@@ -1,0 +1,3 @@
+1. Add a composite index on `(customer_id, created_at DESC)` so Postgres can filter, order, and stop after 20 rows in one index scan.
+2. Replace `SELECT *` with only the columns you need, and include those columns in the index if you want an index-only scan.
+3. Confirm with `EXPLAIN (ANALYZE, BUFFERS)` that the plan is an index scan plus Limit, and run `ANALYZE orders` if the planner’s row estimates are stale.

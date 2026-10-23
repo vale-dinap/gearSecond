@@ -1,0 +1,1 @@
+Rust requires every mutable reference to be unique so it can prove a value is changed through only one path at a time. That rule prevents data races and the wider class of memory-safety bugs from aliased mutation, such as iterator invalidation.

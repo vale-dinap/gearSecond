@@ -1,0 +1,1 @@
+Rust allows only one mutable reference at a time so a value cannot be changed through two aliases at once, which would let one reference invalidate the memory or assumptions the other still relies on. That rule prevents data races and the broader class of memory-safety bugs from aliased mutation, such as iterator invalidation and use-after-free.

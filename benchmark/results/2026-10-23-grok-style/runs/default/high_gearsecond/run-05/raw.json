@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries turn one outage into a larger one. Each failed call becomes up to six attempts in a row, all aimed at a dependency that is already failing or overloaded. Callers stay in lockstep, so the extra traffic arrives as a spike instead of spreading out. That spike keeps the dependency from recovering, ties up the caller\u2019s threads and connections, and pushes the failure upstream.\n\nUse a bounded retry policy with backoff, jitter, and a circuit breaker.\n\n- **Retry only transient failures** on idempotent calls: connection errors, timeouts, 429, and 503. Honor `Retry-After` when the server sends it.\n- **Exponential backoff with full jitter.** For example, wait a random time between 0 and `min(cap, base * 2^attempt)` before each retry, with a base around 100\u2013200 ms and a cap around 5\u201330 s. Jitter stops every client from retrying on the same schedule.\n- **Cap both attempts and total time.** Three retries is usually enough, and stop once the caller\u2019s deadline is too close for another attempt to finish.\n- **Add a retry budget.** Allow only a small fraction of extra calls, such as 10% above normal traffic, so retries cannot multiply load during a wide outage.\n- **Open a circuit breaker** when the error rate stays high. Fail fast for a cool-down period, then send a few probe requests. Resume normal calls only after those probes succeed.\n\nBackoff alone still sends extra load. The budget and the circuit breaker are what stop the caller from making the outage worse.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16546-7e62-7003-90eb-64b6a2c07944",
+  "requestId": "e67ef605-962e-4066-b141-765f3c43fc81",
+  "thought": "I need to explain why immediate retries worsen dependency outages and suggest a better retry policy.\n\nImmediate retries create a retry storm. Each failed request triggers up to six attempts, piling traffic onto an already overloaded dependency at the exact moment it is weakest.\n\nThe synchronized retry spike prevents the dependency from recovering. Cascading failure occurs as the calling service's threads and connections become tied up waiting on retries, raising its own latency and error rate. Immediate retries combined with timeouts can also exhaust connection pools, file descriptors, and thread pools.\n\nExponential backoff with jitter spreads retries across time and prevents synchronization. Retry attempts should be capped by maximum retries and elapsed time. Only transient failures such as 429, 503, connection resets, or timeouts should be retried; 4xx client errors must not trigger retries, and Retry-After headers must be respected. A circuit breaker should fail fast when error rates are high and probe periodically for recovery. Retry budgets can also limit total retry volume.",
+  "usage": {
+    "input_tokens": 6036,
+    "cache_read_input_tokens": 9984,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 833,
+    "reasoning_tokens": 506,
+    "total_tokens": 16853
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.00750108,
+  "total_cost_usd_ticks": 75010800,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6036,
+      "outputTokens": 833,
+      "cacheReadInputTokens": 9984,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.00750108
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high+gearsecond",
+    "problem": "default",
+    "run": 5,
+    "wall_s": 19.3,
+    "finished_utc": "2026-10-22T20:21:40+00:00"
+  }
+}

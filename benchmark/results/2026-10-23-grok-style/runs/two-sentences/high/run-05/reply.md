@@ -1,0 +1,1 @@
+Rust treats a mutable reference as exclusive access, so a second one would let two parts of the program change the same value with no defined order. That rule blocks data races, including the single-threaded form known as mutable aliasing, such as iterator invalidation.

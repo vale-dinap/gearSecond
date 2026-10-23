@@ -1,0 +1,36 @@
+{
+  "text": "1. Add a composite B-tree index on `(customer_id, created_at DESC)` so the filter, sort, and `LIMIT 20` are satisfied by one index scan.\n2. Replace `SELECT *` with only the columns you need and `INCLUDE` those columns on the index so the query can be index-only.\n3. Run `ANALYZE orders` and confirm with `EXPLAIN (ANALYZE, BUFFERS)` that the planner uses that index and stops after 20 rows.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16546-c9c3-7473-9aba-6d4a6d96e65a",
+  "requestId": "dfdaade1-4133-467e-befc-6e67ca663089",
+  "thought": "Preparing three one-line suggestions to fix the slow Postgres query on a 50 million row table.\n\nA composite index on (customer_id, created_at DESC) is the first fix. It allows an index scan that returns rows already sorted by date. This lets LIMIT 20 stop early. Avoid SELECT * to enable an index-only scan. Check ANALYZE or a partial index if customer_id selectivity is poor.",
+  "usage": {
+    "input_tokens": 6049,
+    "cache_read_input_tokens": 9984,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 490,
+    "reasoning_tokens": 388,
+    "total_tokens": 16523
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.0068102,
+  "total_cost_usd_ticks": 68102000,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6049,
+      "outputTokens": 490,
+      "cacheReadInputTokens": 9984,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.0068102
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high+gearsecond",
+    "problem": "numbered-3",
+    "run": 6,
+    "wall_s": 9.2,
+    "finished_utc": "2026-10-22T20:21:49+00:00"
+  }
+}

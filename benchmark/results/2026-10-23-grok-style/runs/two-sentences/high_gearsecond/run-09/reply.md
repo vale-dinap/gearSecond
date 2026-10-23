@@ -1,0 +1,1 @@
+Rust rejects two simultaneous mutable references so one path cannot change a value while another still assumes it has exclusive, stable access. That rule stops data races and other memory-safety bugs caused by mutable aliasing, including iterator invalidation.

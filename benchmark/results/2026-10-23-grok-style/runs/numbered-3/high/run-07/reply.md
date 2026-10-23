@@ -1,0 +1,3 @@
+1. Create a composite index with `CREATE INDEX CONCURRENTLY ON orders (customer_id, created_at DESC)` so the filter, descending order, and `LIMIT 20` are served by one index scan.
+2. Select only the columns you need and `INCLUDE` them on that index so Postgres can answer with an index-only scan instead of heap fetches.
+3. Run `EXPLAIN (ANALYZE, BUFFERS)` and `ANALYZE orders` so the planner uses the new index and does not sort every row for that customer.

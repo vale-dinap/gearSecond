@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries multiply load on a dependency that is already failing, so the outage lasts longer and spreads.\n\n## Why this made the outage worse\n\nEach caller request becomes up to six requests in a tight loop: the original call plus five retries, all issued as soon as the previous one fails. During an outage that load does not help. The dependency is already slow or rejecting work, and the extra calls arrive while it is still down.\n\nThat amplification shows up in a few ways:\n\n- **More traffic on the failing service.** If a thousand callers each retry five times at once, the dependency sees about six thousand attempts instead of one thousand. Threads, connections, and CPU stay saturated, so it cannot drain its queue or restart cleanly.\n- **No time to recover.** An immediate retry hits the same overloaded process before it has shed load, restarted, or failed over. Recovery needs a drop in arrival rate. This policy never gives it one.\n- **Synchronized retries.** Every caller fails at roughly the same moment and retries at roughly the same moment. The dependency sees waves of traffic instead of a steady rate, which is the thundering-herd pattern.\n- **The caller fails too.** Each retry holds a connection, a thread, and a timeout budget. Under the outage the caller exhausts its own pools, so healthy requests start failing as well. Upstream services then retry those failures, and the storm moves one tier out.\n- **Retries of errors that will never succeed.** A tight loop also replays 400s, 401s, and 404s, which wastes capacity on calls that cannot succeed.\n\n## Retry policy to use instead\n\nRetry only when another attempt might succeed, wait longer between attempts, and stop calling once the dependency is clearly down.\n\n- **Retry only transient failures:** connection errors, timeouts, HTTP 429, and HTTP 503. Honor `Retry-After` when the server sends it. Do not retry other 4xx responses. Retry only idempotent calls, or calls that carry an idempotency key.\n- **Exponential backoff with full jitter.** For example, wait a random time between 0 and `min(cap, base * 2^attempt)` \u2014 something like base 100 ms, cap 5\u201310 s. Jitter keeps callers from retrying in lockstep. Cap the number of attempts (often 2\u20133, not 5) and also cap total elapsed time so a request cannot outlive its deadline.\n- **A circuit breaker around the client.** After the error rate or consecutive failures cross a threshold, open the circuit and fail fast for a cool-down period. Then allow a few probe calls. If those succeed, close the circuit. While it is open, the dependency gets a real pause and the caller stops spending threads on a dead dependency.\n- **Budgets and isolation.** Bound in-flight calls and retries per dependency (a bulkhead) so one outage cannot take the whole process. Pass the remaining deadline downstream and make each attempt\u2019s timeout shorter than that deadline.\n\nThe goal is fewer calls when the dependency is unhealthy, spaced out so they do not arrive together, and a hard stop when retries are no longer useful.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16547-9a66-7f62-865a-52d898dd9cfa",
+  "requestId": "0a8d71f1-95fa-4d18-b103-9497ae17b2dd",
+  "thought": "I need to explain why immediate retries up to 5 times worsen dependency outages, and suggest a better retry policy.\n\nImmediate retries amplify outages through a thundering herd. The service sends rapid, identical requests to an already overloaded dependency instead of giving it time to recover. A better policy uses exponential backoff with jitter, limits total retries, and adds circuit breakers and timeouts.\n\nEach failed request becomes six attempts. This multiplies load on the failing service. It consumes connection pools, threads, and CPU. Many clients doing this simultaneously create a thundering herd.\n\nImmediate retries can cascade failures across layers. Callers exhaust their own resources and upstream callers may start retrying too. The policy should distinguish retryable errors from non-retryable ones. Tight loops also saturate the caller's connection and thread pools, hurting healthy traffic. A better approach caps total attempts and total elapsed time as a retry budget.",
+  "usage": {
+    "input_tokens": 6011,
+    "cache_read_input_tokens": 8960,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 1149,
+    "reasoning_tokens": 494,
+    "total_tokens": 16120
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.00795464,
+  "total_cost_usd_ticks": 79546400,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6011,
+      "outputTokens": 1149,
+      "cacheReadInputTokens": 8960,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.00795464
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high",
+    "problem": "default",
+    "run": 5,
+    "wall_s": 22.7,
+    "finished_utc": "2026-10-22T20:22:56+00:00"
+  }
+}

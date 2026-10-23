@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries turn one failed call into a burst of calls against a dependency that is already failing. That extra traffic is what deepens the outage.\n\n## Why immediate retries make it worse\n\nSuppose the dependency starts returning errors or timing out. Every caller that would have sent **1** request now sends **6** (the original plus 5 retries), back to back. Across many callers that fail at the same moment, that is a retry storm:\n\n- **Load multiplies on the thing that is already down.** A service at capacity, restarting, or shedding load gets several times the traffic just as it most needs less. Queues, thread pools, and connection pools stay full, so it cannot recover.\n- **The retries are synchronized.** Callers that failed together retry together, with no gap. The dependency sees a stampede instead of a trickle it could drain.\n- **Latency and resources stack on the caller.** Each attempt holds a connection and often waits out a full timeout. Five immediate attempts can turn a 1-second failure into many seconds of occupied threads and sockets. Upstream callers then time out and retry too, and the failure spreads.\n- **Non-transient errors get the same treatment.** A 400 or 404 is retried as hard as a 503, which wastes capacity and does nothing to help the outage.\n\n## Policy to use instead\n\nUse a capped, jittered backoff, and stop calling altogether when the dependency is clearly down.\n\n1. **Exponential backoff with full jitter.** After attempt `n`, wait a random duration in `[0, min(cap, base \u00d7 2^n)]` \u2014 for example base 100 ms, cap 2\u20135 s. The exponential growth leaves a recovery window. The random draw keeps callers from retrying in lockstep.\n2. **A small budget and a deadline.** For example at most 3 attempts, and stop when the total time for the call hits a budget such as 1\u20132 s. The deadline matters more than the attempt count: it keeps one user request from occupying a thread for the sum of every timeout.\n3. **Retry only transient failures.** Connection errors, timeouts, and 408, 429, 502, 503, 504. Honor `Retry-After` when it is present. Do not retry other 4xx responses.\n4. **A circuit breaker on that dependency.** After a run of failures, open the circuit and fail fast for a cool-down (for example 10\u201330 s). Then let a few probe requests through. While the circuit is open, this service stops adding load, which is what lets the dependency come back.\n5. **A bulkhead.** Cap in-flight calls and retries to that dependency so a burst cannot take every thread and connection in the process.\n6. **Idempotency.** Retry only safe or idempotent operations, or send an idempotency key, so a retry cannot apply a side effect twice.\n\nBackoff alone is not enough during a long outage: callers still converge on the dependency, just more slowly. The circuit breaker is what cuts the amplification off.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16547-3961-7c23-870a-e52d2a0ba985",
+  "requestId": "8cd3cef7-3a16-4a5d-9323-5af9cdeae2b2",
+  "thought": "This is a distributed systems question about retry policies. I need to explain why immediate retries worsen dependency outages and suggest a better approach.\n\nImmediate retries amplify load on a failing dependency. Each failed request becomes six requests total, creating a thundering herd that worsens the outage.\n\nWithout backoff, the dependency has no breathing room to recover. Synchronized retries from many clients at once create a continuous hammering rather than a brief spike.\n\nRapid retries also exhaust the caller's own resources. Connection pools and thread pools can drain, cascading failure upstream.\n\nStacked timeouts worsen latency. Five attempts at two seconds each can stretch a single request to twelve seconds. This ties up upstream threads and load balancer connections, triggering more retries and a full cascade.\n\nImmediate retries also waste work on non-transient errors like 4xx responses. The service should fail fast rather than retry.\n\nA better policy uses exponential backoff with jitter to spread out retries and let the dependency recover. Retries should be capped at two or three attempts, and a total deadline should prevent the caller from exceeding its SLA.\n\nRetry only transient failures such as 429, 503, 502, connection resets, and timeouts. Honor Retry-After headers.\n\nA circuit breaker can stop calls entirely after a threshold of failures. It waits during a cool-down period and probes with a few requests before closing again.\n\nBulkheads cap in-flight requests to the dependency so retries cannot exhaust the caller's resources.\n\nIf the dependency is known down, return a degraded response or cached data immediately rather than retrying.\n\nIdempotency is another key factor. Only safe or idempotent operations should be retried, or the service must use idempotency keys to prevent double-apply side effects.",
+  "usage": {
+    "input_tokens": 6012,
+    "cache_read_input_tokens": 8960,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 1866,
+    "reasoning_tokens": 1226,
+    "total_tokens": 16838
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.009418,
+  "total_cost_usd_ticks": 94180000,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6012,
+      "outputTokens": 1866,
+      "cacheReadInputTokens": 8960,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.009418
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high",
+    "problem": "default",
+    "run": 9,
+    "wall_s": 32.4,
+    "finished_utc": "2026-10-22T20:22:41+00:00"
+  }
+}

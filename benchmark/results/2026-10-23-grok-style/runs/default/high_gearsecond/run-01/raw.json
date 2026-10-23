@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries turned one failed call into a burst of extra calls against a dependency that was already failing, so the dependency stayed overloaded and took longer to recover.\n\n## Why it made the outage worse\n\nEach caller retried up to five times with no delay. One user request became as many as six requests (the original plus five retries) in the same failure window. With many callers doing that at once, offered load jumped by about 6\u00d7 exactly when the dependency could handle the least.\n\nThat has three effects:\n\n- **No recovery window.** The dependency never gets a quiet interval to restart, finish garbage collection, drain a queue, or scale. Every failure is followed at once by more traffic.\n- **Synchronized spikes.** Callers that fail together also retry together. The load arrives as a thundering herd instead of spreading out, so a brief blip becomes a sustained overload.\n- **Resource pile-up on both sides.** Each retry holds a connection, a thread, and pool slots until it times out. Upstream callers then time out and retry too, so retries multiply across the call chain. Pools saturate, latency climbs, and healthy traffic gets crowded out by work that is going to fail anyway.\n\nThe dependency can look \u201cdown\u201d long after the original fault is gone, because the retry traffic alone is enough to keep it saturated.\n\n## Policy to use instead\n\nRetry only transient failures on idempotent calls (timeouts, connection resets, 429, 503). Do not retry deterministic client errors. Bound every call with a per-try timeout and an overall deadline so the retry chain cannot outlive the caller\u2019s budget.\n\nUse **exponential backoff with full jitter**:\n\n```text\nsleep = random(0, min(cap, base * 2^attempt))\n```\n\nA typical start is a base around 100\u2013200 ms, a cap of a few seconds, and at most 2\u20133 attempts. Jitter stops clients from lining up on the same timestamps. If the response includes `Retry-After`, wait at least that long.\n\nAdd two load limits so retries cannot multiply traffic without bound:\n\n- **Retry budget.** Keep retries to a small fraction of total traffic (on the order of 10%). Once the budget is spent, fail fast instead of retrying.\n- **Circuit breaker.** After a run of failures, open the circuit and stop calling for a cool-down. Then allow a few probe requests. If they succeed, close the circuit. If they fail, stay open. That sheds load while the dependency is down and lets it recover.\n\nTogether, backoff spreads the retries, the budget caps how much extra load you add, and the breaker stops calling a dependency that is not answering.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16545-edee-7f22-9a63-93db433cbfb0",
+  "requestId": "cace3462-e6a3-41df-9f47-97dcab6cb21a",
+  "thought": "I need to explain why immediate retries worsen dependency outages and suggest a better retry policy.\n\nImmediate retries create a thundering herd. One failing request becomes up to six requests hitting the already overloaded dependency. This amplifies load and deepens the outage.\n\nRetry storms cascade failures. Simultaneous callers pile on traffic that keeps the dependency saturated even as it recovers. Timeouts and exhausted pools worsen the collapse. Without backoff, retries land in the same failure window, leaving no recovery window for garbage collection, restarts, or scaling.\n\nSynchronized retries spike load when many clients fail at once. Callers waste latency on doomed retries and may time out themselves, triggering nested retries across the call chain. The better policy is exponential backoff with jitter, such as base wait multiplied by two raised to the attempt power plus random jitter.\n\nCap retries at two or three and limit them to idempotent calls on transient errors such as 429, 503, connection resets, and timeouts. Exclude 4xx client errors.\n\nUse a retry budget or token bucket to restrict retries to a small fraction of total traffic. This prevents unbounded load multiplication.\n\nA circuit breaker should open after a failure threshold and probe with a few requests before closing. Retries must respect shorter deadlines than the caller\u2019s total budget, and the service should honor Retry-After headers and load-shed signals. Hedging is risky and can amplify the storm.",
+  "usage": {
+    "input_tokens": 6036,
+    "cache_read_input_tokens": 9984,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 1353,
+    "reasoning_tokens": 800,
+    "total_tokens": 17373
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.00856188,
+  "total_cost_usd_ticks": 85618800,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6036,
+      "outputTokens": 1353,
+      "cacheReadInputTokens": 9984,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.00856188
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high+gearsecond",
+    "problem": "default",
+    "run": 1,
+    "wall_s": 26.2,
+    "finished_utc": "2026-10-22T20:21:10+00:00"
+  }
+}

@@ -1,0 +1,1 @@
+Rust treats a mutable reference as unique, so the compiler can assume nothing else reads or writes that value while it exists. Allowing two at once would permit aliased mutation, the class of bugs behind data races and single-threaded errors such as iterator invalidation.

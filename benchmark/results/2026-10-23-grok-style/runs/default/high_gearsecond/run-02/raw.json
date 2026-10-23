@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries multiplied the load on a dependency that was already failing, so the outage spread instead of clearing.\n\nEach failed call became up to six calls in a row (the original plus five retries), all at once. During an outage many callers fail together, so those bursts line up: a service that was struggling suddenly sees several times its normal traffic, with no pause in which to recover. Threads, connection pools, and queues stay full on both sides, latency climbs, and more callers start failing and retrying. A partial outage turns into a retry storm.\n\nUse a policy that retries less, later, and only while the dependency still looks healthy:\n\n- **Retry only transient failures.** Connection errors, timeouts, and 429/502/503/504 are worth another try. A 4xx that means the request itself is wrong should fail immediately. Retry only idempotent calls, or ones you can safely repeat.\n- **Exponential backoff with jitter.** Wait something like `random(0, base * 2^attempt)` between tries (full jitter), and honor `Retry-After` when the server sends it. Jitter keeps every client from retrying on the same tick.\n- **A short budget.** Cap attempts (often 2\u20133) and cap total time spent retrying so one call cannot hold a thread for the whole outage.\n- **A circuit breaker.** After a run of failures, stop calling for a cool-down, then send a few probes. While the circuit is open, fail fast. That removes the extra load until the dependency is actually answering again.\n- **A concurrency limit** on in-flight calls to that dependency, so retries cannot consume the whole client.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16546-080e-7ce1-942b-dd5dbc9e13c6",
+  "requestId": "0bfa9bf4-ffb7-4360-b8db-af1e1e0bb068",
+  "thought": "I need to explain why immediate retries during an outage worsen the problem. I will suggest a better retry policy.\n\nImmediate retries create a retry storm. One failing request becomes up to six requests hitting an already overloaded dependency. Load multiplies by roughly six times exactly when the service can least handle it.\n\nImmediate retries lack backoff, so the dependency never gets a chance to recover. Many clients failing at once creates synchronized retry spikes. Both sides exhaust resources, turning a partial outage into a full cascade.\n\nImmediate retries stack timeouts. Five attempts can multiply latency and exhaust thread pools, causing unrelated failures.\n\nThey also conflate transient and persistent errors. Retrying 5xx or connection failures during a hard outage only hammers the dependency further.\n\nA better policy uses exponential backoff with jitter. This spreads retries across time and prevents synchronized retry spikes.\n\nThe retry policy should also cap total elapsed time rather than just the number of attempts. It should only retry idempotent methods and specific retryable status codes like 429, 502, 503, 504, or connection resets. It should ignore 400, 401, 403, and 404.\n\nHonor Retry-After headers when present.\n\nA circuit breaker is essential. After a threshold of failures it stops calling the dependency for a cooldown period. It then probes with a few requests in a half-open state before returning to normal operation. This stops amplification entirely during sustained outages.",
+  "usage": {
+    "input_tokens": 6034,
+    "cache_read_input_tokens": 9984,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 1065,
+    "reasoning_tokens": 718,
+    "total_tokens": 17083
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.007973,
+  "total_cost_usd_ticks": 79730000,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6034,
+      "outputTokens": 1065,
+      "cacheReadInputTokens": 9984,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.007973
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high+gearsecond",
+    "problem": "default",
+    "run": 2,
+    "wall_s": 20.1,
+    "finished_utc": "2026-10-22T20:21:10+00:00"
+  }
+}

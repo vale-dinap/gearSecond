@@ -1,0 +1,3 @@
+1. Add a composite B-tree index on `(customer_id, created_at DESC)` so Postgres can filter and return the newest 20 rows without sorting that customer's full history.
+2. Replace `SELECT *` with only the columns you need, and `INCLUDE` those columns on the index if you want an index-only scan.
+3. Run `ANALYZE orders` and raise the statistics target on `customer_id` so the planner's row estimates stay accurate at 50 million rows.

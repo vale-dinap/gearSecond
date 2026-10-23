@@ -1,0 +1,14 @@
+The endpoint of an 8-step walk lies on the line \(y = x\) precisely when it is one of the points \((k, k)\) for an integer \(k\) with \(|k| \le 4\). A self-avoiding walk cannot return to the origin, so the case \(k = 0\) contributes nothing. The eight remaining endpoints come in centrally symmetric pairs, and it is enough to treat \(k > 0\) and double the result.
+
+- For \((4, 4)\) every step is E or N. All \(\binom{8}{4} = 70\) sequences are self-avoiding.
+- For \((3, 3)\) the only admissible step counts are \(\{4\mathrm{E},1\mathrm{W},3\mathrm{N}\}\) and \(\{3\mathrm{E},4\mathrm{N},1\mathrm{S}\}\). In the first family the single west step must occupy a horizontal run by itself (any longer run containing both E and W immediately repeats a vertex). There are 4 choices for that run and \(\binom{6}{2} = 15\) ways to distribute the four east steps into the remaining runs, giving 60 walks; the second family is equinumerous by reflection across \(y = x\). Total: 120.
+- For \((2, 2)\) the admissible counts are \(\{4\mathrm{E},2\mathrm{W},2\mathrm{N}\}\), \(\{2\mathrm{E},4\mathrm{N},2\mathrm{S}\}\) and \(\{3\mathrm{E},1\mathrm{W},3\mathrm{N},1\mathrm{S}\}\). The first two families are monotone in one coordinate; each horizontal (respectively vertical) run must be unidirectional, which leaves exactly 18 walks in each family. In the third family the only possible repeated vertices arise from an immediate reversal or from a 4-step sub-walk that uses each cardinal direction once. Enumerating the placements of the unique W and S that avoid both phenomena produces 76 walks. Total: 112.
+- For \((1, 1)\) the admissible counts are \(\{4\mathrm{E},3\mathrm{W},1\mathrm{N}\}\), \(\{1\mathrm{E},4\mathrm{N},3\mathrm{S}\}\), \(\{3\mathrm{E},2\mathrm{W},2\mathrm{N},1\mathrm{S}\}\) and \(\{2\mathrm{E},1\mathrm{W},3\mathrm{N},2\mathrm{S}\}\). The first two families each contain 2 walks (the two opposite directions must occupy opposite sides of the single north or east step). For the third family the three vertical steps create four horizontal runs whose heights are completely determined by the order of those vertical steps. Each run must be unidirectional and runs that lie at the same height must occupy disjoint \(x\)-intervals. Exhaustive examination of the finitely many ways to distribute three E’s and two W’s yields 18 walks for the order S-N-N, 18 walks for the order N-N-S, and none for the order N-S-N, hence 36 walks; the fourth family is equinumerous by reflection. Total: 76.
+
+Adding these contributions gives
+\[
+70 + 120 + 112 + 76 = 378
+\]
+walks that end on the open half-line \(y = x > 0\). The same number end on \(y = x < 0\), so the total is 756.
+
+ANSWER: 756

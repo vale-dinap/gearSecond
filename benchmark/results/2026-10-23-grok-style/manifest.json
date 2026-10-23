@@ -1,0 +1,70 @@
+{
+  "task": "style",
+  "cli": "grok",
+  "cli_version": "1.0.67",
+  "model": "grok-4.7",
+  "arms": [
+    "high",
+    "high+gearsecond"
+  ],
+  "runs_per_arm": 10,
+  "problems": {
+    "two-sentences": "f32555faf7d7100d616ed7c8f965c06b94f6c53615a49ff9bf9f87ceeca69e6b",
+    "numbered-3": "2a4d04e6e0e2e1b91a35ccd14903559ec36309456d88232b68a8986861d9ed09",
+    "compact": "fdbfffd3e21b5985c1c0f8c50d0ca6b8ad2a2476128f586e1f49f6ecf39f7117",
+    "default": "d0035da801a0b6af7929857639ce2cc7304383154ebf91ca217ce5d1e500ad7d"
+  },
+  "skills": {
+    "gearsecond": {
+      "sha256": "2390d40b200fa377330a13bb77450fa8d2f66c46580fae80c8419aa8adad0c8f",
+      "file": "skill-gearsecond.md",
+      "source": "skills/gearsecond/SKILL.md"
+    }
+  },
+  "cli_args": {
+    "high": [
+      "grok",
+      "--prompt-file",
+      "<prompt.txt>",
+      "--output-format",
+      "json",
+      "-m",
+      "grok-4.7",
+      "--reasoning-effort",
+      "high",
+      "--tools",
+      "",
+      "--disable-web-search",
+      "--no-subagents",
+      "--no-plan",
+      "--max-turns",
+      "1"
+    ],
+    "high+gearsecond": [
+      "grok",
+      "--prompt-file",
+      "<prompt.txt>",
+      "--output-format",
+      "json",
+      "-m",
+      "grok-4.7",
+      "--reasoning-effort",
+      "high",
+      "--tools",
+      "",
+      "--disable-web-search",
+      "--no-subagents",
+      "--no-plan",
+      "--max-turns",
+      "1",
+      "<appended: problem system text, then skill-gearsecond.md>"
+    ]
+  },
+  "isolation": "no tools, no web search, no subagents, no plan mode, max 1 turn, empty HOME so ~/.claude skills/plugins/CLAUDE.md aren't picked up (GROK_HOME keeps the login), fresh empty cwd per run",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.2",
+  "runner_sha256": "d182a15be990a8f31df4ab9f36e989877f1f5197f8874dde095beef0498378e8",
+  "bench_sha256": "78a691cb09af6262b030db736736bc784eb07ed5c2c492450565482c26c6dc9d",
+  "started_utc": "2026-10-22T20:19:54+00:00",
+  "finished_utc": "2026-10-22T20:23:02+00:00"
+}

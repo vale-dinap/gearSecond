@@ -1,0 +1,36 @@
+{
+  "text": "Default `items=[]` is created once, when Python defines `add`, and reused on every call that omits `items`. First `add(1)` appends into that same list. Second `add(2)` appends into it again, so you get `[1, 2]`.\n\nFix: use `None` as the default and make a new list inside the function.\n\n```python\ndef add(x, items=None):\n    if items is None:\n        items = []\n    items.append(x)\n    return items\n```\n\nNow each call with no `items` gets its own list. `add(1)` returns `[1]`. `add(2)` returns `[2]`. Passing a list still mutates that list: `add(3, [1, 2])` returns `[1, 2, 3]`.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16547-c708-76d3-a43d-23b837843c0a",
+  "requestId": "01e19ec0-cde4-4862-826f-5b89bacb3cd5",
+  "thought": "This is a classic Python gotcha involving mutable default arguments.",
+  "usage": {
+    "input_tokens": 14422,
+    "cache_read_input_tokens": 1664,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 281,
+    "reasoning_tokens": 100,
+    "total_tokens": 16367
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.01066308,
+  "total_cost_usd_ticks": 106630800,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 14422,
+      "outputTokens": 281,
+      "cacheReadInputTokens": 1664,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.01066308
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high+gearsecond",
+    "problem": "compact",
+    "run": 7,
+    "wall_s": 5.2,
+    "finished_utc": "2026-10-22T20:22:50+00:00"
+  }
+}

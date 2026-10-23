@@ -1,0 +1,1 @@
+Rust rejects two live `&mut` references to the same value because mutation must be exclusive: while one reference can write, no other alias may read or write that memory. That rule blocks data races and mutable-aliasing bugs such as iterator invalidation and use-after-free.

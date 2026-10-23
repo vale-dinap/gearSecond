@@ -1,0 +1,1 @@
+Rust rejects two live mutable references to the same value so a mutable borrow stays exclusive: nothing else can read or write that value while it is being changed. That rule blocks data races and other memory-safety bugs from aliased mutation, including iterator invalidation and use-after-free.

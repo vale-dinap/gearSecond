@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries turn one failure into a burst of extra load on a dependency that is already failing, so the outage lasts longer and spreads.\n\n## Why immediate retries make the outage worse\n\nEach caller treats a failure as \u201ctry again right now,\u201d up to five more times. During an outage that means:\n\n- **Load multiplies.** One user request becomes up to six calls (the original plus five retries). Every client does this at once, so traffic to the dependency can jump several times just as it is least able to handle it.\n- **Recovery never starts.** The dependency stays saturated: connection pools, thread pools, and queues stay full, so requests keep timing out. Those timeouts trigger more immediate retries. The feedback loop keeps the service down after the original fault would have cleared.\n- **Clients fail together.** With no delay, every caller retries in the same instant. That synchronized spike is a retry storm. It also burns the caller\u2019s own connections and threads, so slowness in one dependency becomes failures across the service.\n\nRetries only help when the failure is brief and rare. An outage is the opposite: widespread and ongoing. Retrying it at once spends capacity that the dependency needed in order to come back.\n\n## Policy to use instead\n\nRetry a small number of times, only for retryable errors, with **exponential backoff and full jitter**, and stop calling entirely when the dependency is clearly down.\n\n1. **Retry only transient failures.** Retry connection errors, timeouts, HTTP 429, and HTTP 5xx. Do not retry most HTTP 4xx responses. Retry only operations that are safe to repeat, or send an idempotency key.\n2. **Back off exponentially, then add jitter.** Wait longer after each failure, for example base 100 ms doubled each attempt, capped around 5\u201310 s. Sleep a random time between 0 and that delay (`sleep = random(0, min(cap, base * 2^attempt))`). The growing delay gives the dependency room to recover. The randomness keeps many clients from retrying on the same tick.\n3. **Cap attempts and total time.** Three attempts is usually enough, inside a deadline shorter than the caller\u2019s own timeout. Give up and return an error rather than spending the whole latency budget on retries.\n4. **Open a circuit breaker.** After a sustained failure rate, stop sending real traffic and fail fast. Allow a few probe requests through. Close the circuit only after those succeed. This cuts the retry storm off at the source.\n5. **Honor `Retry-After`.** If the dependency sends that header on HTTP 429 or 503, wait at least that long before the next attempt.\n\nThe dependency then sees a shrinking, unsynchronized trickle of retries instead of a multiplied flood, and callers fail quickly once it is clear the outage is still in progress.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16546-ae6b-7513-ad93-e57eb47aeb9b",
+  "requestId": "6618f367-dee6-471c-a33f-431ab373aaa9",
+  "thought": "Immediate retries during an outage amplify the failure by flooding the dependency with requests. A better approach is to use exponential backoff with jitter, which spreads out retry attempts and gives the system time to recover.\n\nThis is a conceptual question. The problem is a retry storm or thundering herd. Circuit breakers, respecting Retry-After headers, and timeout budgets are also worth mentioning.\n\nEach failed request multiplies load by up to six times. Simultaneous retries from many clients hammer the dependency at once, exhausting queues and thread pools. This creates a cascading failure loop. Immediate retries also waste client resources like connections and threads.\n\nRetry only idempotent calls and retryable errors such as 5xx, 429, or connection failures. Avoid retries on 4xx client errors.\n\nCap the total number of retries and the overall time budget.\n\nUse load shedding or bulkheads to isolate dependencies and prevent one from exhausting the entire service.\n\nA circuit breaker should stop requests when failure rates spike, fail fast, and probe periodically to test recovery.",
+  "usage": {
+    "input_tokens": 13312,
+    "cache_read_input_tokens": 1664,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 1177,
+    "reasoning_tokens": 595,
+    "total_tokens": 16153
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.01173612,
+  "total_cost_usd_ticks": 117361200,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 13312,
+      "outputTokens": 1177,
+      "cacheReadInputTokens": 1664,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.01173612
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high",
+    "problem": "default",
+    "run": 4,
+    "wall_s": 22.9,
+    "finished_utc": "2026-10-22T20:21:56+00:00"
+  }
+}

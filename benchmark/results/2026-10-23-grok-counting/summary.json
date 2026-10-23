@@ -1,0 +1,175 @@
+{
+  "manifest": {
+    "task": "counting",
+    "cli": "grok",
+    "cli_version": "1.0.67",
+    "model": "grok-4.7",
+    "arms": [
+      "high",
+      "high+gearsecond"
+    ],
+    "runs_per_arm": 5,
+    "problems": {
+      "saw": "441b1d0c38b9597f4e0d378b8c8ed99a651363849013a47cefb61b21da1e393e",
+      "saw_diag": "99333dee234350b8984a974b02ca1bd3bc527948e748170cff3844088afe4e90",
+      "saw_quad": "cfadfb6876198ab56e7c8c88a103ad76eecba7d493382f840535f4cef3f7c93f"
+    },
+    "skills": {
+      "gearsecond": {
+        "sha256": "2390d40b200fa377330a13bb77450fa8d2f66c46580fae80c8419aa8adad0c8f",
+        "file": "skill-gearsecond.md",
+        "source": "plugins/gearsecond/skills/gearsecond/SKILL.md"
+      }
+    },
+    "cli_args": {
+      "high": [
+        "grok",
+        "--prompt-file",
+        "<prompt.txt>",
+        "--output-format",
+        "json",
+        "-m",
+        "grok-4.7",
+        "--reasoning-effort",
+        "high",
+        "--tools",
+        "",
+        "--disable-web-search",
+        "--no-subagents",
+        "--no-plan",
+        "--max-turns",
+        "5"
+      ],
+      "high+gearsecond": [
+        "grok",
+        "--prompt-file",
+        "<prompt.txt>",
+        "--output-format",
+        "json",
+        "-m",
+        "grok-4.7",
+        "--reasoning-effort",
+        "high",
+        "--tools",
+        "",
+        "--disable-web-search",
+        "--no-subagents",
+        "--no-plan",
+        "--max-turns",
+        "5",
+        "<appended: problem system text, then skill-gearsecond.md>"
+      ]
+    },
+    "isolation": "no tools, no web search, no subagents, no plan mode, at most 5 turns (Grok sometimes writes a preamble turn first), empty HOME so ~/.claude skills/plugins/CLAUDE.md aren't picked up (GROK_HOME keeps the login), fresh empty cwd per run",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.2",
+    "runner_sha256": "95ab5b9b0468b727392a6ae9ea200286fc236e2c664fc51c09b614cde93d43dc",
+    "bench_sha256": "70c56158c45a4d7d2895d01fb833db72753f0084e601b83fd064e09064393afa",
+    "started_utc": "2026-10-22T22:02:29+00:00",
+    "finished_utc": "2026-10-23T07:32:19+00:00"
+  },
+  "cells": [
+    {
+      "problem": "saw",
+      "arm": "high",
+      "runs": 5,
+      "failed": 0,
+      "quality": 0.8,
+      "thinking": [
+        108422,
+        118758,
+        139234,
+        75374,
+        108832
+      ],
+      "cost_total": 1.26504888
+    },
+    {
+      "problem": "saw",
+      "arm": "high+gearsecond",
+      "runs": 5,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        83031,
+        124412,
+        98781,
+        77283,
+        91228
+      ],
+      "cost_total": 1.02329052
+    },
+    {
+      "problem": "saw_diag",
+      "arm": "high",
+      "runs": 5,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        131538,
+        122925,
+        112273,
+        104753,
+        93327
+      ],
+      "cost_total": 1.1898606
+    },
+    {
+      "problem": "saw_diag",
+      "arm": "high+gearsecond",
+      "runs": 5,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        84192,
+        96340,
+        93006,
+        94451,
+        87134
+      ],
+      "cost_total": 0.98514932
+    },
+    {
+      "problem": "saw_quad",
+      "arm": "high",
+      "runs": 4,
+      "failed": 0,
+      "quality": 0.75,
+      "thinking": [
+        130994,
+        132253,
+        173015,
+        123274
+      ],
+      "cost_total": 1.29355924
+    },
+    {
+      "problem": "saw_quad",
+      "arm": "high+gearsecond",
+      "runs": 5,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        146853,
+        113971,
+        137031,
+        87451,
+        114429
+      ],
+      "cost_total": 1.2702638
+    }
+  ],
+  "comparisons": [
+    {
+      "arm": "high+gearsecond",
+      "baseline": "high",
+      "thinking_change": -0.15718216762101245,
+      "ci95": [
+        -0.24551889422105444,
+        -0.058685931713244543
+      ],
+      "p": 0.0082991700829917,
+      "quality_change": 0.1428571428571429
+    }
+  ]
+}

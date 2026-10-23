@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries turned one outage into a retry storm. Each failed call was sent again up to five times with no pause, so the dependency received up to six times its normal traffic while it was already failing. That extra load kept it from recovering, and the same pattern spread upstream.\n\n**Why it got worse**\n\n- **Load multiplied.** One user request became as many as six calls (the original plus five retries). With many callers, the dependency saw a sudden multiple of its usual QPS, more open connections, and deeper queues.\n- **No time to recover.** The next attempt went out at once, while the service was still down or saturated. Recovery needs a drop in arrival rate; these retries removed that drop.\n- **Retries lined up.** Callers that failed together retried together. The result was synchronized spikes, not a smooth trickle of retries.\n- **Caller resources filled up too.** Each attempt held a connection, a thread, or a pool slot until it timed out. Five fast failures stacked that wait, so the caller\u2019s own pools filled and it started failing its callers.\n- **Timeouts duplicated work.** A timed-out request was often still running on the server. The retry added a second copy of the same work on a service that was already behind.\n\n**Policy to use instead**\n\nRetry only transient failures (connect errors, timeouts, 429, and 502/503/504). Leave 4xx and other deterministic errors alone. Cap retries at about two or three, and stop when a single overall deadline is exhausted so the caller still meets its own latency budget.\n\nSpace the attempts with exponential backoff and full jitter: wait `random(0, min(cap, base * 2^attempt))`, and honor `Retry-After` when the server sends it. Jitter keeps many clients from retrying on the same tick.\n\nPut a circuit breaker in front of the dependency. After a run of failures, open the circuit and fail fast for a cool-down window, then let a few probes through. While it is open, send no retries.\n\nAlso cap how much of your traffic retries may be (a retry budget of around 10% of requests, or a token bucket). Retries then cannot multiply load without bound. Retry only idempotent calls, or send an idempotency key, so a second attempt does not apply the same side effect twice.\n\nBackoff alone is not enough during a hard outage. The circuit breaker and the retry budget are what stop the callers from hammering a dependency that needs the traffic to stop.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16546-9929-7b52-904c-5ee1f00a3015",
+  "requestId": "64895a01-3a3b-4f50-b368-2ac41de3935d",
+  "thought": "I need to explain why immediate retries worsen dependency outages and suggest a better retry policy.\n\nThis is a classic retry storm. Immediate retries multiply traffic to the failing dependency by up to six times, amplifying the outage instead of relieving it.\n\nThe extra load prevents recovery by exhausting connections, CPU, and queue depth. Immediate retries also lack backoff, so the dependency is hit while still failing. When many clients fail simultaneously, they all retry at once, creating synchronized traffic spikes.\n\nRapid retries also exhaust caller-side resources like connection pools and thread pools. The caller's latency increases as it waits through failed attempts, its thread pool fills, and it starts failing its own callers upstream. Retrying non-retryable errors or retrying when the service is clearly down wastes work and adds unnecessary load.\n\nRetries can duplicate work when the original request is still in-flight on the server, especially without idempotency.\n\nThe better approach uses exponential backoff with jitter to prevent synchronized retry storms. It also limits total retries and enforces a hard time budget so the caller does not exceed its own SLA.\n\nLimit retries to two or three attempts within a strict deadline. Only retry transient failures such as 429, 502, 503, connection resets, and timeouts. Ignore client errors like 400, 401, 403, and 404, and honor Retry-After headers.\n\nA circuit breaker is also essential. After a threshold of failures, the circuit opens and stops calling the dependency for a cool-down period. This fails fast and prevents further load. Once the cool-down ends, the circuit probes with a few requests before closing again.\n\nA retry budget or token bucket can cap the fraction of traffic that retries, preventing unbounded load multiplication. Adaptive concurrency limits like Netflix concurrency-limits are another option.\n\nIdempotency keys should be used so retries do not duplicate side effects.\n\nPer-attempt timeouts must stay shorter than the overall deadline, and backoff must fit within the remaining time budget.",
+  "usage": {
+    "input_tokens": 6014,
+    "cache_read_input_tokens": 8960,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 1404,
+    "reasoning_tokens": 882,
+    "total_tokens": 16378
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.00847688,
+  "total_cost_usd_ticks": 84768800,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6014,
+      "outputTokens": 1404,
+      "cacheReadInputTokens": 8960,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.00847688
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high",
+    "problem": "default",
+    "run": 3,
+    "wall_s": 25.8,
+    "finished_utc": "2026-10-22T20:21:53+00:00"
+  }
+}

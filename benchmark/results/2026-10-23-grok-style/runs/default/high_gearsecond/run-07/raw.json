@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries turned one failed call into a burst of extra load on a dependency that was already failing, so the outage lasted longer and spread further.\n\n## Why it made the outage worse\n\nEach user request became up to six requests (the original call plus five retries), all sent with no pause. During an outage that multiplies traffic at the worst moment:\n\n- The dependency is already slow or erroring. Extra calls fill its queues, saturate threads and connections, and drive latency up, so more calls time out and retry.\n- Callers pile on together. When the dependency blips, every client retries at once. That synchronized spike is a retry storm: recovery starts, the burst knocks it over again, and the outage stretches.\n- The caller suffers too. Holding five extra attempts per request ties up its own connection pool, threads, and memory, so a downstream outage becomes an upstream one.\n- A fixed cap of five does not limit damage if many callers each send all five immediately. The limit is per call, not on aggregate load.\n\n## Policy to use instead\n\nRetry only calls that are safe to repeat (idempotent methods, or requests with an idempotency key) and only for transient failures: connection errors, timeouts, and 408, 429, and 5xx responses. Do not retry other 4xx responses.\n\nUse exponential backoff with full jitter, and a hard deadline for the whole operation:\n\n- Wait `random(0, min(cap, base * 2^attempt))` before each retry (for example base 100 ms, cap 2\u20135 s).\n- Allow a small number of attempts (about 3) and stop when the overall deadline is reached, even if attempts remain.\n- Honor `Retry-After` on 429 and 503.\n\nPair that with a circuit breaker. After a run of failures, open the circuit and fail fast for a cool-down, then let a few probes through. While the circuit is open, callers shed load instead of hammering the dependency. A client-side concurrency limit or retry budget (only a fraction of calls may be retries) keeps aggregate retry traffic bounded even when many requests fail at once.\n\nThat gives the dependency quiet time to recover, spreads retries so they do not land together, and stops the caller from spending its own resources on calls that are not going to succeed.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16546-155b-73d0-b408-baae73655372",
+  "requestId": "a0db2b78-001f-4d7a-9f23-468f00393b3e",
+  "thought": "I need to explain why immediate retries worsen dependency outages and suggest a better retry policy.\n\nImmediate retries amplify the load by multiplying each failing request into up to six calls against the already-degraded dependency. They also prevent recovery time and create a thundering herd when many clients retry simultaneously.\n\nExtra load can exhaust the caller's own resources, turning a partial outage into a full one. The dependency may recover, only to be hit again by the retry storm. A better approach is exponential backoff with jitter.",
+  "usage": {
+    "input_tokens": 6033,
+    "cache_read_input_tokens": 9984,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 905,
+    "reasoning_tokens": 418,
+    "total_tokens": 16922
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.00764592,
+  "total_cost_usd_ticks": 76459200,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6033,
+      "outputTokens": 905,
+      "cacheReadInputTokens": 9984,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.00764592
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high+gearsecond",
+    "problem": "default",
+    "run": 7,
+    "wall_s": 19.0,
+    "finished_utc": "2026-10-22T20:21:12+00:00"
+  }
+}

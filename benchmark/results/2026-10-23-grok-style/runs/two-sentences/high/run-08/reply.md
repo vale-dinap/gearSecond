@@ -1,0 +1,1 @@
+Rust allows only one mutable reference to a value at a time so mutation stays exclusive and the compiler can treat that reference as the sole access path. That rule prevents data races and aliased-mutation bugs such as iterator invalidation and use-after-free.

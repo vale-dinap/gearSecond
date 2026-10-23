@@ -1,0 +1,1 @@
+Rust allows only one mutable reference at a time so that mutation is exclusive and no other reference can read or write the same value while it changes. That rule prevents data races, including the single-threaded form where one alias mutates memory another alias still uses, such as iterator invalidation or use-after-free.

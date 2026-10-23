@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries multiply load on a dependency that is already failing, so the outage lasts longer and spreads.\n\n## Why it gets worse\n\nEach caller request becomes up to six calls (the original plus five retries). If many callers hit the outage at once, they all retry at the same moment. That is a retry storm: the dependency sees a burst several times larger than normal traffic exactly when it cannot keep up.\n\nImmediate retries also give the dependency no quiet interval in which to recover. Threads, connection pools, and CPU stay saturated on both sides. Queues grow, timeouts pile up, and the calling service itself slows down. Its own callers then time out and retry, so the extra load cascades upstream.\n\nRetries during an outage are also mostly useless. A process that is down, overloaded, or restarting is still down a few milliseconds later. The extra attempts fail the same way and only add work.\n\n## Policy to use instead\n\nRetry only when the call is safe to repeat and the error looks transient: connection failures, timeouts, HTTP 429, and HTTP 503. Do not retry other 4xx responses.\n\nUse **exponential backoff with full jitter**, and cap both the attempt count and the total time:\n\n- Wait `random(0, min(cap, base * 2^attempt))` before each retry. A typical start is a base of about 100 ms, a cap around 5\u201330 seconds, and at most 3 retries.\n- Stop when a per-request deadline is reached, even if attempts remain. That deadline should be shorter than the caller\u2019s own timeout.\n- Honor a `Retry-After` header when the dependency sends one.\n- Put a **circuit breaker** in front of the dependency. After a run of failures, fail fast and send only occasional probes until it recovers. Limit how many retries can be in flight so they cannot fill the thread pool or connection pool.\n\nBackoff spreads retries out in time. Jitter stops clients from lining up on the same delays. The circuit breaker stops calling a dependency that is clearly down, which is what lets it recover.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16546-a68e-7751-be54-0db8b375557f",
+  "requestId": "9c6d5d0a-3dc7-40d0-80f8-4e4461e060a9",
+  "thought": "This is a classic retry storm. Immediate retries during an outage amplify failures by creating a thundering herd of requests.\n\nEach user request becomes up to six attempts. The dependency receives up to six times the normal load during an outage. Without backoff, it never gets breathing room to recover.\n\nSynchronized retries from many clients at once create traffic spikes. The extra load can exhaust connection pools, thread pools, and CPU on both sides. Timeouts queue up and latency increases. That can trigger upstream callers to retry too, causing cascading amplification.\n\nImmediate retries are useless when an outage lasts longer than a few milliseconds. The dependency stays down, so retries fail instantly and only add load.\n\nIf the failure is caused by overload rather than a transient blip, retries worsen the problem instead of fixing it.\n\nThe client itself becomes unhealthy. Threads block and connection pools saturate, leaving no capacity to serve other work.\n\nA better policy uses exponential backoff with jitter. Retries should be capped or limited by elapsed time. Only idempotent requests and retryable errors like 429, 503, timeouts, or connection resets should be retried; 4xx client errors should not. Respect Retry-After headers. Set per-request deadlines to protect the caller's SLA. A circuit breaker can fail fast when the dependency is down and probe periodically.",
+  "usage": {
+    "input_tokens": 13435,
+    "cache_read_input_tokens": 1536,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 1084,
+    "reasoning_tokens": 656,
+    "total_tokens": 16055
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.01160828,
+  "total_cost_usd_ticks": 116082800,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 13435,
+      "outputTokens": 1084,
+      "cacheReadInputTokens": 1536,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.01160828
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high",
+    "problem": "default",
+    "run": 7,
+    "wall_s": 20.8,
+    "finished_utc": "2026-10-22T20:21:51+00:00"
+  }
+}

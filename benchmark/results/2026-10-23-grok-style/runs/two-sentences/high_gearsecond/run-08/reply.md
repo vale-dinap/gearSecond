@@ -1,0 +1,1 @@
+Rust allows only one mutable reference at a time so it can prove that nothing else is reading or writing that value while it is being changed. That exclusivity prevents data races and the related memory-safety bugs from aliased mutation, including iterator invalidation and use-after-free.

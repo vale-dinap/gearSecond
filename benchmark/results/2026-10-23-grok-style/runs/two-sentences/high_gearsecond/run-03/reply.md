@@ -1,0 +1,1 @@
+Rust allows only one mutable reference to a value at a time so mutation stays exclusive and no other reference can read or write that memory while it changes. That rule prevents data races.

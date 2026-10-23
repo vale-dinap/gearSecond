@@ -1,0 +1,3 @@
+1. Create a composite index with `CREATE INDEX CONCURRENTLY ON orders (customer_id, created_at DESC)` so Postgres can return the 20 newest rows for that customer without sorting.
+2. Replace `SELECT *` with only the columns you need, and add those columns as `INCLUDE` columns if you want an index-only scan.
+3. Run `ANALYZE orders` and confirm the plan with `EXPLAIN (ANALYZE, BUFFERS)` so the planner uses current statistics and the new index.

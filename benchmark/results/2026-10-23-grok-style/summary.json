@@ -1,0 +1,247 @@
+{
+  "manifest": {
+    "task": "style",
+    "cli": "grok",
+    "cli_version": "1.0.67",
+    "model": "grok-4.7",
+    "arms": [
+      "high",
+      "high+gearsecond"
+    ],
+    "runs_per_arm": 10,
+    "problems": {
+      "two-sentences": "f32555faf7d7100d616ed7c8f965c06b94f6c53615a49ff9bf9f87ceeca69e6b",
+      "numbered-3": "2a4d04e6e0e2e1b91a35ccd14903559ec36309456d88232b68a8986861d9ed09",
+      "compact": "fdbfffd3e21b5985c1c0f8c50d0ca6b8ad2a2476128f586e1f49f6ecf39f7117",
+      "default": "d0035da801a0b6af7929857639ce2cc7304383154ebf91ca217ce5d1e500ad7d"
+    },
+    "skills": {
+      "gearsecond": {
+        "sha256": "2390d40b200fa377330a13bb77450fa8d2f66c46580fae80c8419aa8adad0c8f",
+        "file": "skill-gearsecond.md",
+        "source": "skills/gearsecond/SKILL.md"
+      }
+    },
+    "cli_args": {
+      "high": [
+        "grok",
+        "--prompt-file",
+        "<prompt.txt>",
+        "--output-format",
+        "json",
+        "-m",
+        "grok-4.7",
+        "--reasoning-effort",
+        "high",
+        "--tools",
+        "",
+        "--disable-web-search",
+        "--no-subagents",
+        "--no-plan",
+        "--max-turns",
+        "1"
+      ],
+      "high+gearsecond": [
+        "grok",
+        "--prompt-file",
+        "<prompt.txt>",
+        "--output-format",
+        "json",
+        "-m",
+        "grok-4.7",
+        "--reasoning-effort",
+        "high",
+        "--tools",
+        "",
+        "--disable-web-search",
+        "--no-subagents",
+        "--no-plan",
+        "--max-turns",
+        "1",
+        "<appended: problem system text, then skill-gearsecond.md>"
+      ]
+    },
+    "isolation": "no tools, no web search, no subagents, no plan mode, max 1 turn, empty HOME so ~/.claude skills/plugins/CLAUDE.md aren't picked up (GROK_HOME keeps the login), fresh empty cwd per run",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.2",
+    "runner_sha256": "d182a15be990a8f31df4ab9f36e989877f1f5197f8874dde095beef0498378e8",
+    "bench_sha256": "78a691cb09af6262b030db736736bc784eb07ed5c2c492450565482c26c6dc9d",
+    "started_utc": "2026-10-22T20:19:54+00:00",
+    "finished_utc": "2026-10-22T20:23:02+00:00"
+  },
+  "cells": [
+    {
+      "problem": "compact",
+      "arm": "high",
+      "runs": 10,
+      "failed": 0,
+      "quality": 0.0,
+      "thinking": [
+        261,
+        255,
+        238,
+        205,
+        180,
+        118,
+        342,
+        466,
+        126,
+        278
+      ],
+      "cost_total": 0.09301448
+    },
+    {
+      "problem": "compact",
+      "arm": "high+gearsecond",
+      "runs": 10,
+      "failed": 0,
+      "quality": 0.0,
+      "thinking": [
+        255,
+        170,
+        118,
+        237,
+        152,
+        359,
+        100,
+        217,
+        167,
+        224
+      ],
+      "cost_total": 0.0983008
+    },
+    {
+      "problem": "default",
+      "arm": "high",
+      "runs": 10,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        893,
+        888,
+        882,
+        595,
+        494,
+        881,
+        656,
+        663,
+        1226,
+        520
+      ],
+      "cost_total": 0.09601736
+    },
+    {
+      "problem": "default",
+      "arm": "high+gearsecond",
+      "runs": 10,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        800,
+        718,
+        392,
+        386,
+        506,
+        326,
+        418,
+        572,
+        537,
+        333
+      ],
+      "cost_total": 0.09248816
+    },
+    {
+      "problem": "numbered-3",
+      "arm": "high",
+      "runs": 10,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        653,
+        518,
+        485,
+        566,
+        378,
+        393,
+        540,
+        553,
+        467,
+        423
+      ],
+      "cost_total": 0.0937754
+    },
+    {
+      "problem": "numbered-3",
+      "arm": "high+gearsecond",
+      "runs": 10,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        587,
+        476,
+        587,
+        520,
+        546,
+        388,
+        465,
+        456,
+        590,
+        423
+      ],
+      "cost_total": 0.08292872
+    },
+    {
+      "problem": "two-sentences",
+      "arm": "high",
+      "runs": 10,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        724,
+        1367,
+        665,
+        498,
+        1113,
+        932,
+        692,
+        546,
+        880,
+        551
+      ],
+      "cost_total": 0.09211552
+    },
+    {
+      "problem": "two-sentences",
+      "arm": "high+gearsecond",
+      "runs": 10,
+      "failed": 0,
+      "quality": 1.0,
+      "thinking": [
+        513,
+        868,
+        574,
+        644,
+        459,
+        376,
+        743,
+        919,
+        479,
+        865
+      ],
+      "cost_total": 0.0799612
+    }
+  ],
+  "comparisons": [
+    {
+      "arm": "high+gearsecond",
+      "baseline": "high",
+      "thinking_change": -0.20102981264332997,
+      "ci95": [
+        -0.2986640471512769,
+        -0.09079277827796994
+      ],
+      "p": 0.0040995900409959,
+      "quality_change": 0.0
+    }
+  ]
+}

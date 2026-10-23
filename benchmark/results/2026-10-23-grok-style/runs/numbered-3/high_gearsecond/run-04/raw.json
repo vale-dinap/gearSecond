@@ -1,0 +1,36 @@
+{
+  "text": "1. Create a composite B-tree index on `(customer_id, created_at DESC)` so Postgres can return the 20 newest rows for that customer without sorting.\n2. Replace `SELECT *` with only the columns you need, and `INCLUDE` those columns on the index if you want an index-only scan.\n3. Run `ANALYZE orders` and keep autovacuum current so the planner uses that index on a 50-million-row table.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16547-7a3a-7e51-933e-a1e1c327d24a",
+  "requestId": "2360aa58-1715-4219-8f2e-758e27e934c4",
+  "thought": "Preparing three concise one-line suggestions to optimize the slow Postgres query.\n\nA composite index on (customer_id, created_at DESC) would let the query filter and sort without scanning all matching rows. Avoiding SELECT * and using only needed columns is also recommended. Keyset pagination should be considered instead of OFFSET for better performance at scale.",
+  "usage": {
+    "input_tokens": 6049,
+    "cache_read_input_tokens": 9984,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 617,
+    "reasoning_tokens": 520,
+    "total_tokens": 16650
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.00706928,
+  "total_cost_usd_ticks": 70692800,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6049,
+      "outputTokens": 617,
+      "cacheReadInputTokens": 9984,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.00706928
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high+gearsecond",
+    "problem": "numbered-3",
+    "run": 4,
+    "wall_s": 10.7,
+    "finished_utc": "2026-10-22T20:22:36+00:00"
+  }
+}

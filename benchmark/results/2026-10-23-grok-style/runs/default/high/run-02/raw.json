@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries multiplied traffic into a dependency that was already failing, so the outage lasted longer and spread.\n\nEach failed call became up to six attempts in a tight burst (the original call plus five retries). With no delay, those attempts landed while the dependency was still down or overloaded. Across many callers that failed at the same time, the bursts lined up. A service that was struggling with 1x load suddenly saw about 6x, often on the same saturated threads, connection pools, and CPU. That extra work produces more timeouts, which produce more retries. The dependency cannot shed load and recover, queues grow, and upstream callers start timing out and retrying too.\n\nA better policy fails fast when the dependency is unhealthy, and retries only transient errors with a capped, jittered backoff:\n\n- **Retry only transient failures.** Retry connection resets, timeouts, HTTP 429, and 502/503/504. Do not retry 400, 401, 403, 404, or other client errors. Retry a non-idempotent write only when the call carries an idempotency key.\n- **Exponential backoff with full jitter and a cap.** For example, wait `random(0, min(cap, 100ms * 2^attempt))`, with the cap around 2\u20135 seconds. Jitter keeps many clients from retrying on the same tick. Honor `Retry-After` when the server sends it.\n- **Few attempts inside one deadline.** Use about three attempts total, and stop when the remaining time is less than the next wait plus a reasonable timeout. A caller with a 1-second budget should not spend several seconds retrying.\n- **A circuit breaker around the client.** After a short run of consecutive failures, open the circuit and fail immediately for a cool-down (for example 10\u201330 seconds). Then allow a few probe calls. If they succeed, close the circuit. While it is open, callers get a fast error instead of adding load.\n- **Bound in-flight work.** Cap concurrent calls and retries to that dependency (a bulkhead or adaptive limit) so a retry loop cannot exhaust the caller\u2019s own threads and connections.\n\nThe dependency then sees a smaller, spread-out trickle of retries and long quiet gaps in which it can recover, and the caller spends its time failing fast instead of amplifying the outage.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16545-8942-7d72-adaf-61cff24aab51",
+  "requestId": "a54212e4-dac7-4f16-a7fa-2fd2452462f3",
+  "thought": "I need to explain why immediate retries up to 5 times worsen dependency outages, and propose a better retry policy.\n\nImmediate retries multiply load by up to six times during an outage. The dependency receives far more requests than it can handle, which worsens the failure instead of helping recovery.\n\nA retry storm from many clients hitting the dependency simultaneously can saturate its resources and trap it in a failed state. This causes cascading failures upstream and creates a positive feedback loop of timeouts and retries. Without backoff or jitter, all clients retry in lockstep at the exact moment of failure.\n\nRetrying non-idempotent or non-transient errors wastes work. Retries against an overloaded system add load rather than help recovery. The policy also lacks a circuit breaker, a timeout budget, and a clear distinction between retryable and non-retryable errors.\n\nA better policy uses exponential backoff capped at a few seconds, plus full jitter to randomize delays and prevent lockstep retries. Retries should be limited to three attempts total, and only retry transient failures such as 429, 502, 503, connection resets, or timeouts. The Retry-After header on 429 and 503 responses should also be honored.\n\nAn overall deadline should stop retries before the caller's timeout expires. A circuit breaker can open after consecutive failures and fail fast during a cool-down period, then probe half-openly to test recovery. Idempotency keys or safe operations should be used so retries do not duplicate work. Load shedding and bulkheads on the caller side prevent retries from exhausting local resources. Adaptive concurrency or token buckets can bound retry rate. Hedged requests are another pattern that may amplify load.",
+  "usage": {
+    "input_tokens": 12668,
+    "cache_read_input_tokens": 2304,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 1371,
+    "reasoning_tokens": 888,
+    "total_tokens": 16343
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.01180276,
+  "total_cost_usd_ticks": 118027600,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 12668,
+      "outputTokens": 1371,
+      "cacheReadInputTokens": 2304,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.01180276
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high",
+    "problem": "default",
+    "run": 2,
+    "wall_s": 27.0,
+    "finished_utc": "2026-10-22T20:20:45+00:00"
+  }
+}

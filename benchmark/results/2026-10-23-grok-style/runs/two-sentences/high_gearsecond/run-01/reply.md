@@ -1,0 +1,1 @@
+Rust allows only one live mutable reference so a value cannot be changed through one alias while another alias reads or writes it. That rule rejects data races at compile time.

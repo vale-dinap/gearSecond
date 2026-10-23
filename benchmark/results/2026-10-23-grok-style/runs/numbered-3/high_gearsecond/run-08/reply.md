@@ -1,0 +1,3 @@
+1. Add a B-tree index on `(customer_id, created_at DESC)` so Postgres can fetch that customer's newest 20 rows without sorting the whole table.
+2. Run `EXPLAIN (ANALYZE, BUFFERS)` and `ANALYZE orders` to confirm an index scan that stops at 20 rows and that planner stats match the 50 million-row table.
+3. Select only the columns you need and `INCLUDE` them on that index so the plan can stay index-only.

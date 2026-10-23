@@ -1,0 +1,1 @@
+Rust allows only one mutable reference to a value at a time so the compiler can treat that reference as the only live path to the data and reject conflicting access before the program runs. That rule prevents data races, where one part of the program writes memory while another reads or writes it without synchronization.

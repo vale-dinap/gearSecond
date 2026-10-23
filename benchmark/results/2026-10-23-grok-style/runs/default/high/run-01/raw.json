@@ -1,0 +1,36 @@
+{
+  "text": "Immediate retries multiplied load on a dependency that was already failing, so it could not recover.\n\nEach caller turned one failed call into as many as six (the original plus five retries) in a tight loop. While the dependency was down, those retries all failed too, but they still consumed connections, threads, and CPU on both sides. Callers that failed together retried together, so the extra traffic arrived as synchronized bursts. When the dependency started to come back, that burst often pushed it over capacity again. In-flight work also piled up: each logical call waited through several timeouts, so the caller exhausted its own pools and the outage spread upstream.\n\nUse a bounded policy that fails fast once the dependency is clearly unhealthy:\n\n- Retry only transient failures (timeouts, connection resets, 429, 503), and only idempotent calls or ones protected by an idempotency key. Honor `Retry-After` when it is present.\n- Cap attempts at about three total, with a per-try timeout and an overall deadline. Skip another try if the deadline cannot fit it.\n- Wait with exponential backoff and full jitter: `sleep = random(0, min(cap, base * 2^attempt))`, with a cap of a few seconds. Jitter keeps callers from retrying in lockstep.\n- Limit amplification with a retry budget (for example, retries stay under about 10% of recent calls). Past that budget, fail immediately.\n- Open a circuit breaker after a sustained error rate, fail fast during a cool-down, then send a few probes before closing the circuit.\n\nThat keeps a short blip recoverable and stops an outage from being multiplied by every client.",
+  "stopReason": "end_turn",
+  "sessionId": "01a16546-ea8b-7df0-9237-1b54fcc53d90",
+  "requestId": "f6440336-f22a-4d21-a04f-067de7267a3b",
+  "thought": "This is a classic retry storm problem. Immediate retries during an outage amplify load on the failing dependency.\n\nEach failed request triggers up to six calls. That multiplies load on the failing dependency by a factor of six.\n\nImmediate retries only help brief transient blips. During a sustained outage, every retry fails because the dependency is still down. This wastes connection pools, threads, and CPU on both sides without any chance of recovery.\n\nSynchronized retries from many clients can knock the dependency back down during recovery. This prevents the service from healing.\n\nRapid retries also exhaust the caller's own resources. Thread and connection pools drain. That turns a downstream outage into an upstream cascading failure.\n\nUnbounded retries also waste capacity on non-retryable errors like 4xx responses. Each request's tail latency grows to timeout times six, piling in-flight work and raising concurrency and memory pressure. Without a circuit breaker, the dependency cannot shed load or recover.\n\nA better policy uses exponential backoff with jitter. This spreads retries over time and prevents synchronized waves that can knock the dependency down again.\n\nRetries should be limited to two or three attempts. They should apply only to retryable errors like timeouts, 429s, 503s, and connection resets.\n\nRetry budgets or token buckets can cap the fraction of requests that may be retries.\n\nA circuit breaker should open after a threshold of failures and fail fast during a cool-down period. It can then half-open probe to test recovery.\n\nPer-try timeouts must stay shorter than the overall deadline. Retries should be skipped if the remaining time cannot fit another attempt.\n\nRespect Retry-After headers on 429 and 503 responses.\n\nOnly idempotent operations or requests with idempotency keys should be retried.",
+  "usage": {
+    "input_tokens": 6010,
+    "cache_read_input_tokens": 8960,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 1236,
+    "reasoning_tokens": 893,
+    "total_tokens": 16206
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.00813144,
+  "total_cost_usd_ticks": 81314400,
+  "modelUsage": {
+    "grok-4.7-build": {
+      "inputTokens": 6010,
+      "outputTokens": 1236,
+      "cacheReadInputTokens": 8960,
+      "cacheCreationInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.00813144
+    }
+  },
+  "runner": {
+    "cli": "grok",
+    "arm": "high",
+    "problem": "default",
+    "run": 1,
+    "wall_s": 23.2,
+    "finished_utc": "2026-10-22T20:22:11+00:00"
+  }
+}
