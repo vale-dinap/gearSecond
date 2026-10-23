@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# Rust fixture build output
+benchmark/tasks/rust-review/target/
+benchmark/tasks/rust-review/Cargo.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# API keys for the benchmark backends
+benchmark/.env

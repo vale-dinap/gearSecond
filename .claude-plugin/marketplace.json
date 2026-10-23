@@ -1,0 +1,12 @@
+{
+  "name": "gearsecond",
+  "description": "Shift the model's thinking into a faster gear: denser reasoning, quicker answers, fewer tokens.",
+  "owner": { "name": "Valerio Di Napoli", "url": "https://github.com/vale-dinap" },
+  "plugins": [
+    {
+      "name": "gearsecond",
+      "source": "./plugins/gearsecond",
+      "description": "Same model, same effort level, geared up to jet-think: faster answers, fewer thinking tokens, lower cost, same quality."
+    }
+  ]
+}
