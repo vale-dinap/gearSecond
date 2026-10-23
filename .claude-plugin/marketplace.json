@@ -6,7 +6,7 @@
     {
       "name": "gearsecond",
       "source": "./plugins/gearsecond",
-      "description": "Same model, same effort level, geared up to jet-think: faster answers, fewer thinking tokens, lower cost, same quality."
+      "description": "Shifts your model's reasoning into a faster gear: fewer thinking tokens, lower cost, same answers."
     }
   ]
 }

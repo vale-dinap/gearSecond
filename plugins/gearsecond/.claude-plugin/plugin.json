@@ -1,7 +1,7 @@
 {
   "name": "gearsecond",
   "version": "1.0.0",
-  "description": "Pump up the reasoning: the same model at the same effort level, geared up to jet-think. Faster answers, fewer thinking tokens, lower cost on reasoning-heavy work, same quality; replies keep whatever style they would otherwise have.",
+  "description": "Shifts your model's reasoning into a faster gear: fewer thinking tokens, lower cost, same answers. Replies keep whatever style they would otherwise have.",
   "author": { "name": "Valerio Di Napoli", "url": "https://github.com/vale-dinap" },
   "repository": "https://github.com/vale-dinap/gearsecond",
   "license": "Apache-2.0",
