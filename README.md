@@ -58,7 +58,7 @@ Same model, same effort level, with and without the skill. Thinking tokens are t
 | Model                  | Runs per arm | Correct         | Thinking (95% CI, p)                     | Time                | Cost per problem  |
 |------------------------|--------------|-----------------|------------------------------------------|---------------------|-------------------|
 | Claude Haiku 5.5, high | 15           | 15/15 → 15/15 | **−27%** (−40% to −12%, p = 0.005) | 394 s → 313 s     | $0.048 → $0.036 |
-| Grok 4.7, high         | 15           | 12/14 → 15/15 | **−16%** (−25% to −6%, p = 0.008)  | 2,957 s → 2,534 s | $0.271 → $0.219 |
+| Grok 4.7, high         | 15           | 12/15 → 15/15 | **−16%** (−25% to −6%, p = 0.008)  | 2,957 s → 2,534 s | $0.271 → $0.219 |
 
 
 ### Reply style is kept
