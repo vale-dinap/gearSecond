@@ -153,7 +153,8 @@ class LMStudio:
     # for a while: wait and retry, and never score a rejected request as a wrong answer.
     backoff_s = (30, 60, 120)
     transient_http = (400, 429, 500, 503)
-    url = os.environ.get("LMSTUDIO_URL", "http://localhost:2345/v1")
+    # LM Studio's default port; any OpenAI-compatible local server works (run.py --url)
+    url = os.environ.get("LMSTUDIO_URL", "http://localhost:1234/v1")
     isolation = ("raw chat-completions API, no agent system prompt: the skill (if any) is the only "
                  "system message; model settings (sampling, context, reasoning budget) from LM Studio")
 

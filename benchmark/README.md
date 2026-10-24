@@ -88,8 +88,9 @@ personal.
   - The skill goes in through `--rules`, which appends to Grok's system prompt.
 
 - **Local models (LM Studio, `--cli lmstudio`):** there's no agent. The runner calls the
-  local OpenAI-compatible server (default `http://localhost:2345/v1`, override with
-  `LMSTUDIO_URL`). The task is the user message, and the skill, if any, is the only system
+  local OpenAI-compatible server: LM Studio's default `http://localhost:1234/v1`, or the
+  URL in `LMSTUDIO_URL` or `--url`. Any other OpenAI-compatible runtime works the same way
+  (`--url http://localhost:<port>/v1`); the manifest records the URL. The task is the user message, and the skill, if any, is the only system
   message.
   - **Model settings:** sampling, context and reasoning budget come from the model's own
     LM Studio settings, which the runner can't read. Pass them with `--reasoning-budget`

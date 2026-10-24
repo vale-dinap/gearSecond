@@ -75,9 +75,15 @@ def main():
                     help="the model's reasoning-token cap, if one is set outside the runner (recorded; "
                          "runs that reach it are reported as hitting the budget)")
     ap.add_argument("--note", help="free text recorded in the manifest, e.g. local model settings")
+    ap.add_argument("--url", help="lmstudio only: base URL of the OpenAI-compatible server "
+                                  "(default: $LMSTUDIO_URL, else http://localhost:1234/v1)")
     a = ap.parse_args()
 
     cli = CLIS[a.cli]
+    if a.url:
+        if cli.name != "lmstudio":
+            sys.exit("--url applies only to --cli lmstudio")
+        cli.url = a.url.rstrip("/")
     model = a.model or cli.default_model
     arms = a.arms.split(",")
     for arm in arms:
@@ -129,6 +135,8 @@ def main():
         "runner_sha256": sha256(Path(__file__).read_text(encoding="utf-8")),
         "bench_sha256": sha256(Path(bench.__file__).read_text(encoding="utf-8")),
     })
+    if cli.name == "lmstudio":
+        manifest["server_url"] = cli.url
     if a.reasoning_budget:
         manifest["reasoning_budget"] = a.reasoning_budget
     if a.note:
