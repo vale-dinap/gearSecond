@@ -95,7 +95,8 @@ def load_counting(task_dir):
     out = []
     for p in json.loads((task_dir / "problems.json").read_text(encoding="utf-8")):
         def score(reply, expected=p["answer"]):
-            m = re.findall(r"ANSWER:\s*(.+)", reply)
+            # The label in any case, as models also write "Answer:" or "**Answer:**".
+            m = re.findall(r"\bANSWER\**:\s*(.+)", reply, flags=re.I)
             got = m[-1].strip() if m else ""
             return {"score": float(_norm(got) == _norm(expected)), "got": got, "expected": expected}
         out.append({"id": p["id"], "prompt": p["question"] + ANSWER_SUFFIX, "score": score})
