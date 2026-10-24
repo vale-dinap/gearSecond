@@ -67,7 +67,8 @@ def load_review(task_dir, file="src/lib.rs", spec=RUST_REVIEW, pid="lib.rs"):
         # The last ISSUES heading; some models drop the colon or wrap it in markdown.
         heads = list(re.finditer(r"ISSUES\b\**:?", reply))
         tail = reply[heads[-1].end():] if heads else ""
-        cited = [int(x) for x in re.findall(r"^\s*[-*]?\s*`?L(\d+)", tail, flags=re.M)]
+        # Bullets, bold and backticks may precede the line number: "- **L46:**", "`L46`".
+        cited = [int(x) for x in re.findall(r"^[\s\-*`]*L(\d+)", tail, flags=re.M)]
 
         def hits(c, marks):
             return any(m - REVIEW_SLACK_BEFORE <= c <= m + REVIEW_SLACK_AFTER for m in marks)
