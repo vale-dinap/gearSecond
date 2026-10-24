@@ -15,3 +15,6 @@ Thumbs.db
 
 # API keys for the benchmark backends
 benchmark/.env
+
+# Draft skill variants under test (not published)
+benchmark/variants/
