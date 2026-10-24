@@ -1,8 +1,8 @@
 # GearSecond
 
-**Pump up the reasoning: a skill that gears your model up to jet-think.** Faster answers, fewer thinking tokens, lower cost, with the same model at the same effortlevel and the same quality.
+**Pump up the reasoning: a skill that gears your model up to jet-think.** Faster answers, fewer thinking tokens, lower cost, with the same model at the same effort level and the same quality.
 
-GearSecond changes how a model thinks, not how it answers. Thinking becomes short bursts ofkey inferences: no full sentences, no filler, no self-talk, one check and then stop. Thereply keeps whatever style it would have had anyway, including any style you, your projector another skill asked for.
+GearSecond changes how a model thinks, not how it answers. Thinking becomes short bursts of key inferences: no full sentences, no filler, no self-talk, one check and then stop. The reply keeps whatever style it would have had anyway, including any style you, your project or another skill asked for.
 
 Thinking without the skill:
 
@@ -35,12 +35,12 @@ Then say `/gearsecond` or "gear second". It stays on until you say "stop gearsec
 
 Other ways to use it:
 
-- **claude.ai:** download `gearsecond.zip` from the latest release and upload it underSettings → Capabilities → Skills.
-- **Any agent or API:** the skill is plain text. Append the body of[`SKILL.md`](plugins/gearsecond/skills/gearsecond/SKILL.md) (everything after thefrontmatter) to the system prompt. That's also how the benchmark delivers it.
+- **claude.ai:** download `gearsecond.zip` from the latest release and upload it under Settings → Capabilities → Skills.
+- **Any agent or API:** the skill is plain text. Append the body of [`SKILL.md`](plugins/gearsecond/skills/gearsecond/SKILL.md) (everything after the frontmatter) to the system prompt. That's also how the benchmark delivers it. If your model pays little attention to the system prompt (some local models do), put it at the top of your first message instead.
 
 ## Results
 
-Same model, same effort level, with and without the skill. Thinking tokens are the countsthe provider bills, not estimates. Each row compares means over repeated runs, with a 95%bootstrap interval and a permutation test.
+Same model, same effort level, with and without the skill. Thinking tokens are the counts the provider bills, not estimates. Each row compares means over repeated runs, with a 95% bootstrap interval and a permutation test.
 
 ### Code review: a 290-line Rust module with 8 planted bugs
 
@@ -63,7 +63,7 @@ Same model, same effort level, with and without the skill. Thinking tokens are t
 
 ### Reply style is kept
 
-Four prompts: no style request, "at most two sentences", "exactly 3 numbered points", and acompact style set in the system prompt (no articles, filler or pleasantries). The skill isplaced *after* the style request, the position where it would be most likely to override it.
+Four prompts: no style request, "at most two sentences", "exactly 3 numbered points", and a compact style set in the system prompt (no articles, filler or pleasantries). The skill is placed *after* the style request, the position where it would be most likely to override it.
 
 
 | Model                      | No style        | Two sentences   | 3 points        | Compact            |
@@ -73,20 +73,20 @@ Four prompts: no style request, "at most two sentences", "exactly 3 numbered poi
 | Grok 4.7 (10 runs)         | 10/10 → 10/10 | 10/10 → 10/10 | 10/10 → 10/10 | 0/10 → 0/10      |
 
 
-Grok CLI's own reply guidelines override styles set in the system prompt, with or withoutthe skill, hence 0/10 in both arms.
+Grok CLI's own reply guidelines override styles set in the system prompt, with or without the skill, hence 0/10 in both arms.
 
-Every table, the exact prompts and every raw response are in[`benchmark/results`](benchmark/results/README.md), and the whole benchmark reruns with one command.See [`benchmark/README.md`](benchmark/README.md).
+Every table, the exact prompts and every raw response are in [`benchmark/results`](benchmark/results/README.md), and the whole benchmark reruns with one command. See [`benchmark/README.md`](benchmark/README.md).
 
 ## When it helps, and when it doesn't
 
-- **Reasoning-heavy work** (reviews, debugging, maths, planning) is where it pays: thinkingis most of the output there, and it's what the skill shortens.
-- **Short prompts** cost slightly more. The skill adds about 1,000 input tokens, and aone-line question has little thinking to save.
-- **The effort level is still the biggest lever.** GearSecond makes each effort levelcheaper and quicker; it doesn't replace choosing a lower one when a task is easy.
+- **Reasoning-heavy work** (reviews, debugging, maths, planning) is where it pays: thinking is most of the output there, and it's what the skill shortens.
+- **Short prompts** cost slightly more. The skill adds about 1,000 input tokens, and a one-line question has little thinking to save.
+- **The effort level is still the biggest lever.** GearSecond makes each effort level cheaper and quicker; it doesn't replace choosing a lower one when a task is easy.
 
 ## Known limitations
 
-- **Small models and conflicting style rules:** Haiku kept the compact reply style inonly 6 of 10 runs with the skill on, against 10 of 10 without. Larger models kept it.This affects only the reply's wording, not the savings or the answers: on Haiku theskill still cut thinking by 55% on code review and 27% on maths, with nothing missed.
-- **The effect varies by model.** It depends on how compact a model's own reasoningalready is: a model that already thinks tersely has less to compress. A few models may occasionally also apply some of the skill rules to their replies, and answer more briefly.
+- **Small models and conflicting style rules:** Haiku kept the compact reply style in only 6 of 10 runs with the skill on, against 10 of 10 without. Larger models kept it. This affects only the reply's wording, not the savings or the answers: on Haiku the skill still cut thinking by 55% on code review and 27% on maths, with nothing missed.
+- **The effect varies by model.** It depends on how compact a model's own reasoning already is: a model that already thinks tersely has less to compress. A few models may occasionally also apply some of the skill rules to their replies, and answer more briefly.
 
 ## License
 
