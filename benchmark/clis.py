@@ -149,6 +149,10 @@ class LMStudio:
     name = "lmstudio"
     default_model = "openai/gpt-oss-20b"
     parallel_default = 1  # one GPU: requests would only queue
+    # Another client loading or swapping models makes the server reject requests (HTTP 400)
+    # for a while: wait and retry, and never score a rejected request as a wrong answer.
+    backoff_s = (30, 60, 120)
+    transient_http = (400, 429, 500, 503)
     url = os.environ.get("LMSTUDIO_URL", "http://localhost:2345/v1")
     isolation = ("raw chat-completions API, no agent system prompt: the skill (if any) is the only "
                  "system message; model settings (sampling, context, reasoning budget) from LM Studio")
@@ -168,6 +172,9 @@ class LMStudio:
     def headers(self):
         return {"Content-Type": "application/json"}
 
+    def effort_fields(self, effort):
+        return {"reasoning_effort": effort}
+
     def _post(self, body, timeout):
         req = urllib.request.Request(f"{self.url}/chat/completions", data=json.dumps(body).encode(),
                                      headers=self.headers())
@@ -179,17 +186,26 @@ class LMStudio:
         self._post({"model": model, "messages": [{"role": "user", "content": "Reply with OK."}]}, 1800)
 
     def invoke(self, model, effort, prompt, system, timeout, tmp):
+        for wait in (*self.backoff_s, None):
+            t0 = time.time()
+            raw = self._attempt(model, effort, prompt, system, timeout)
+            if not raw.get("transient") or wait is None:
+                raw["attempt_s"] = round(time.time() - t0, 1)  # the run's own time, without retry waits
+                return raw
+            time.sleep(wait)
+
+    def _attempt(self, model, effort, prompt, system, timeout):
         messages = ([{"role": "system", "content": system}] if system else []) + \
                    [{"role": "user", "content": prompt}]
         body = {"model": model, "messages": messages, "stream": False}
         if effort != "default":
-            body["reasoning_effort"] = effort
+            body.update(self.effort_fields(effort))
         try:
             return self._post(body, timeout)
         except TimeoutError:
             return {"runner_error": f"timeout after {timeout} s", "is_error": True}
-        except urllib.error.HTTPError as e:  # rate limits and overload are worth retrying
-            return {"runner_error": f"HTTP {e.code}", "is_error": True, "transient": e.code in (429, 500, 503)}
+        except urllib.error.HTTPError as e:
+            return {"runner_error": f"HTTP {e.code}", "is_error": True, "transient": e.code in self.transient_http}
         except (urllib.error.URLError, ConnectionError):
             return {"runner_error": "server unreachable", "is_error": True, "transient": True}
 
@@ -207,10 +223,14 @@ class LMStudio:
                 "reasoning_text": msg.get("reasoning_content") or msg.get("reasoning") or "",
                 "output": usage.get("completion_tokens") or 0,
                 "cost": 0,
-                "seconds": (raw.get("runner") or {}).get("wall_s", 0),
+                # older runs have no attempt_s: their wall time includes any retry waits
+                "seconds": raw.get("attempt_s") or (raw.get("runner") or {}).get("wall_s", 0),
                 "failed": (bool(raw.get("is_error")) or not text
                            or choice.get("finish_reason") == "length"),
-                "retry": bool(raw.get("transient")),
+                # a request the server never answered says nothing about the model: don't
+                # save or score it (a timeout is the model's own failure, so it still counts)
+                "retry": bool(raw.get("transient")) or (
+                    "runner_error" in raw and not raw["runner_error"].startswith("timeout")),
                 "served": [raw["model"]] if raw.get("model") else []}
 
 
@@ -224,12 +244,25 @@ class Gemini(LMStudio):
     default_model = "gemma-4-31b-it"
     parallel_default = 1
     backoff_s = (30, 60, 120, 240, 480)  # free-tier limits are per minute; wait them out
+    transient_http = (429, 500, 503)  # a 400 here is a bad request, not a busy server
     url = "https://generativelanguage.googleapis.com/v1beta/openai"
     isolation = ("raw chat-completions API (Gemini API, OpenAI-compatible endpoint), no agent "
                  "system prompt: the skill (if any) is the only system message")
 
     def version(self):
         return "gemini-api-v1beta-openai"
+
+    def warmup(self, model):
+        pass  # a hosted model has nothing to load
+
+    def effort_fields(self, effort):
+        # Gemma's thinking is on/off: thinking_level "high" = on, "minimal" = off. In a raw
+        # request the documented passthrough is a literal "extra_body" key.
+        return {"extra_body": {"google": {"thinking_config": {"thinking_level": effort}}}}
+
+    def command(self, model, effort, prompt_file, append_file):
+        return ["POST", f"{self.url}/chat/completions", f"model={model}",
+                *([f"thinking_level={effort}"] if effort != "default" else [])]
 
     def key(self):
         if os.environ.get("GEMINI_API_KEY"):
@@ -249,17 +282,17 @@ class Gemini(LMStudio):
         # This endpoint has no reasoning-token field, but total_tokens includes the thinking:
         # the native API's usageMetadata shows total = prompt + candidates + thoughts.
         x = super().extract(raw)
+        # Gemma's reasoning arrives inside the content as <thought>...</thought>, not in a
+        # separate field: score only the answer and keep the reasoning for the style table.
+        thoughts = re.findall(r"<thought>(.*?)</thought>", x["text"], flags=re.S)
+        if thoughts:
+            x["reasoning_text"] = "\n".join(thoughts)
+            x["text"] = re.sub(r"<thought>.*?</thought>", "", x["text"], flags=re.S).strip()
+            x["failed"] = x["failed"] or not x["text"]
         u = raw.get("usage") or {}
         x["thinking"] = max(u.get("total_tokens", 0) - u.get("prompt_tokens", 0) - u.get("completion_tokens", 0), 0)
         x["output"] = (u.get("completion_tokens") or 0) + x["thinking"]
         return x
-
-    def invoke(self, model, effort, prompt, system, timeout, tmp):
-        for wait in (*self.backoff_s, None):
-            raw = super().invoke(model, effort, prompt, system, timeout, tmp)
-            if not raw.get("transient") or wait is None:
-                return raw
-            time.sleep(wait)
 
     def models(self):
         req = urllib.request.Request(f"{self.url}/models", headers=self.headers())

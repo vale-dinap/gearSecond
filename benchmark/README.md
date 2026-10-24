@@ -64,8 +64,9 @@ python summarize.py results/rust-review
     served as `grok-4.7-build`.
   - `--ids` limits the problems.
   - `--budget-usd` stops starting new runs at a spending limit.
-- **Limits:** a run that hits a rate or usage limit isn't saved. Rerun the same command
-  once the limit resets.
+- **Limits:** a run that hits a rate or usage limit, or that the server never answered,
+  isn't saved and isn't scored. Rerun the same command once the limit resets. A run that
+  times out is the model's own failure, so it is saved and counts as failed.
 - **Interruptions:** runs that already finished are skipped, so an interrupted run can be
   resumed with the same command.
 - **Skill versions:** a results folder holds one version of each variant. If a variant's
@@ -96,6 +97,8 @@ personal.
   - **Hitting the budget:** a run whose reasoning reaches that budget is reported as
     hitting it, so the summary shows how often each arm finishes within budget.
   - **Run order:** one run at a time; a single GPU would only queue them.
+  - **Server busy:** while another client loads or swaps models, LM Studio rejects requests.
+    The runner waits (30 s, then up to 2 min) and retries; a run still rejected isn't saved.
   - **Reasoning style:** LM Studio returns the full reasoning text, so the summary also
     reports its style (articles per word, words per line).
   - **Effort:** arms use effort `default` to keep the model's own setting.

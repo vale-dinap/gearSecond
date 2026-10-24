@@ -26,12 +26,15 @@ CLI_NAMES = {"claude": "Claude Code", "grok": "Grok CLI", "lmstudio": "LM Studio
 def load(folder):
     manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
     problems = {p["id"]: p for p in bench.load_task(manifest["task"])}
-    rows = []
+    rows, skipped = [], 0
     cli = CLIS[manifest.get("cli", "claude")]
     for f in sorted((folder / "runs").glob("*/*/run-*/raw.json")):
         raw = json.loads(f.read_text(encoding="utf-8"))
         meta = raw["runner"]
         x = cli.extract(raw)
+        if x["retry"]:  # saved before the runner skipped these: the server never answered
+            skipped += 1
+            continue
         rows.append({
             "problem": meta["problem"], "arm": meta["arm"], "run": meta["run"],
             "failed": x["failed"],
@@ -40,7 +43,7 @@ def load(folder):
             "seconds": x["seconds"], "cost": x["cost"], "served": x["served"],
             "reasoning_text": x["reasoning_text"],
         })
-    return manifest, rows
+    return manifest, rows, skipped
 
 
 def reasoning_style(text):
@@ -102,7 +105,7 @@ def main():
     ap.add_argument("folder", type=Path)
     ap.add_argument("--baseline")
     a = ap.parse_args()
-    manifest, rows = load(a.folder)
+    manifest, rows, skipped = load(a.folder)
     arms = [arm for arm in manifest["arms"] if any(r["arm"] == arm for r in rows)]
     baseline = a.baseline or arms[0]
     rng = random.Random(0)
@@ -179,7 +182,8 @@ def main():
     total = sum(r["cost"] for r in rows)
     cost_note = {"lmstudio": "no API cost (local model)", "gemini": "cost not reported by the API"}.get(
         manifest.get("cli"), f"total cost ${total:.2f} at list API prices")
-    out += ["", f"{len(rows)} runs, {cost_note}."]
+    out += ["", f"{len(rows)} runs, {cost_note}."
+            + (f" {skipped} runs left out: the server never answered them." if skipped else "")]
     if manifest.get("reasoning_budget"):
         out.append(f"Reasoning budget: {manifest['reasoning_budget']} tokens.")
     if manifest.get("note"):
