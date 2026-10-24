@@ -40,6 +40,11 @@ Other ways to use it:
 
 ## Benchmark results
 
+**TL;DR:** in tests the skill cut thinking by 16% to 77% and answered up to twice as fast.
+Bugs found and maths answers held on Claude and Grok; in code review, two of the open models,
+gpt-oss 20B and Qwen3.6 35B-A3B, found on average under one bug fewer out of eight. The details follow; for the takeaway, skip to
+[When it helps](#when-it-helps-and-when-it-doesnt).
+
 Same model, same effort level, with and without the skill. Thinking tokens are the counts the provider bills, not estimates. Each row compares means over repeated runs, with a 95% bootstrap interval and a permutation test.
 
 ### Code review: a 290-line Rust module with 8 planted bugs
@@ -81,16 +86,16 @@ The quick mix is four exact-answer maths problems, a Python bug hunt and two rep
 
 | Model                         | Task        | Runs per arm | Quality                                | Thinking   | Time          |
 |-------------------------------|-------------|--------------|----------------------------------------|------------|---------------|
-| Gemma 4 26B, thinking on      | Code review | 8            | 6.6/8 → 6.5/8 bugs                     | **−55%** | 115 s → 61 s  |
-| Gemma 4 26B, thinking on      | Quick mix   | 3            | maths, bugs, styles: all kept          | **−77%** |               |
-| Qwen 3.6 35B                  | Code review | 8            | 6.0/8 → 5.4/8 bugs                     | **−25%** | 692 s → 508 s |
-| Qwen 3.6 35B                  | Quick mix   | 5            | maths 20/20, bugs 4/4, styles 10 → 9/10 | **−42%** |               |
-| gpt-oss-20b, medium           | Code review | 20           | 6.2/8 → 5.4/8 bugs                     | **−34%** | 268 s → 170 s |
-| gpt-oss-20b, medium           | Quick mix   | 5            | maths 19/20 → 20/20, bugs 4/4, styles 10 → 9/10 | **−50%** |               |
+| Gemma 4 26B-A4B, thinking on  | Code review | 8            | 6.6/8 → 6.5/8 bugs                     | **−55%** | 115 s → 61 s  |
+| Gemma 4 26B-A4B, thinking on  | Quick mix   | 3            | maths, bugs, styles: all kept          | **−77%** |               |
+| Qwen3.6 35B-A3B               | Code review | 8            | 6.0/8 → 5.4/8 bugs                     | **−25%** | 692 s → 508 s |
+| Qwen3.6 35B-A3B               | Quick mix   | 5            | maths 20/20, bugs 4/4, styles 10 → 9/10 | **−42%** |               |
+| gpt-oss 20B, medium           | Code review | 20           | 6.2/8 → 5.4/8 bugs                     | **−34%** | 268 s → 170 s |
+| gpt-oss 20B, medium           | Quick mix   | 5            | maths 19/20 → 20/20, bugs 4/4, styles 10 → 9/10 | **−50%** |               |
 
 With the skill on, Gemma often skips thinking altogether, and those runs found as many bugs
 as the rest: the skill seems to help it recognise when a task needs no thinking at all. On the
-smaller models, the code review found slightly fewer bugs.
+smaller models, the code review found on average under one bug fewer out of eight.
 
 Every table, the exact prompts and every raw response are in [`benchmark/results`](benchmark/results/README.md), and the whole benchmark reruns with one command. See [`benchmark/README.md`](benchmark/README.md).
 
