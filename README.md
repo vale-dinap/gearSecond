@@ -38,7 +38,7 @@ Other ways to use it:
 - **claude.ai:** download `gearsecond.zip` from the latest release and upload it under Settings → Capabilities → Skills.
 - **Any agent or API:** the skill is plain text. Append the body of [`SKILL.md`](plugins/gearsecond/skills/gearsecond/SKILL.md) (everything after the frontmatter) to the system prompt. That's also how the benchmark delivers it. If your model pays little attention to the system prompt (some local models do), put it at the top of your first message instead.
 
-## Results
+## Benchmark results
 
 Same model, same effort level, with and without the skill. Thinking tokens are the counts the provider bills, not estimates. Each row compares means over repeated runs, with a 95% bootstrap interval and a permutation test.
 
