@@ -1,0 +1,2 @@
+Rust’s borrowing rules forbid two `&mut` references to the same value at once because it guarantees a value has only one mutable owner, eliminating write‑write aliasing.  
+This prevents undefined behaviour like data races and other memory safety errors that arise from concurrent or overlapping mutations.

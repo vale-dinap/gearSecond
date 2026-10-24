@@ -1,0 +1,1 @@
+Rust enforces exclusive mutable access to guarantee memory safety at compile time by ensuring a value cannot be aliased while being mutated. This prevents data races, which occur when unsynchronized concurrent writes corrupt shared memory or cause undefined behavior.

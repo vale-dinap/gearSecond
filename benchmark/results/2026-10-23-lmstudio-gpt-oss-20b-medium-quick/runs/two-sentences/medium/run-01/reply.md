@@ -1,0 +1,1 @@
+Rust forbids holding two mutable references to the same value at once because it would break the guarantee of exclusive access that ensures safe memory manipulation; multiple writers could alias and cause undefined behavior. This rule prevents data‑race bugs (and related unsound mutation bugs) that arise from concurrent or overlapping mutable accesses.

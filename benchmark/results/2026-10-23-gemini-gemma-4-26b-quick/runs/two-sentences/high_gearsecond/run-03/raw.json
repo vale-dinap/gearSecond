@@ -1,0 +1,35 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Rust prevents multiple mutable references to the same value to enforce exclusive access during mutation. This rule prevents data races, where concurrent access to memory causes undefined behavior.",
+        "extra_content": {
+          "google": {
+            "thought": true
+          }
+        },
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1792784878,
+  "id": "7bnbauGRD4nrnsEPwePTyAU",
+  "model": "gemma-4-26b-a4b-it",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 31,
+    "prompt_tokens": 1122,
+    "total_tokens": 1153
+  },
+  "attempt_s": 1.5,
+  "runner": {
+    "cli": "gemini",
+    "arm": "high+gearsecond",
+    "problem": "two-sentences",
+    "run": 3,
+    "wall_s": 92.7,
+    "finished_utc": "2026-10-23T19:47:59+00:00"
+  }
+}

@@ -1,0 +1,2 @@
+Rust’s borrow‑checker blocks two simultaneous `&mut` aliases, because allowing them would let the same value be mutated through multiple paths at once and could cause data races or other undefined behaviour.  
+This rule prevents the *unsound mutation aliasing* bug class that can lead to race conditions in concurrent code.

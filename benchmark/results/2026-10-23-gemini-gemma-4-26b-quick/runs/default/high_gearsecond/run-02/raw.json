@@ -1,0 +1,35 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "### Why immediate retries worsen outages\n\nWhen a dependency fails due to overload, immediate retries create a **retry storm**. Instead of allowing the dependency to recover, the service sends a massive surge of additional traffic (the original requests plus the retries). This constant pressure prevents the dependency from clearing its queue or stabilizing, effectively turning a temporary slowdown into a total collapse.\n\n### Recommended Retry Policy\n\nTo prevent this, you should implement a policy combining **Exponential Backoff** and **Jitter**:\n\n1.  **Exponential Backoff:** Instead of retrying immediately, increase the wait time between each attempt (e.g., 1s, 2s, 4s, 8s...). This gives the dependency breathing room to recover.\n2.  **Jitter (Randomization):** Add a random delay to the backoff intervals. If many clients retry at the exact same exponentially increasing intervals, they will still hit the dependency in synchronized waves. Jitter breaks these waves, spreading the load evenly over time.\n3.  **Circuit Breaker:** Supplement retries with a circuit breaker pattern. If the failure rate exceeds a specific threshold, the breaker \"trips,\" and the service stops attempting all calls to that dependency for a set period. This provides an immediate \"cool-down\" period for the failing system.",
+        "extra_content": {
+          "google": {
+            "thought": true
+          }
+        },
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1792787257,
+  "id": "M8PbavvxHdbRnsEP3MTngQo",
+  "model": "gemma-4-26b-a4b-it",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 272,
+    "prompt_tokens": 1127,
+    "total_tokens": 1399
+  },
+  "attempt_s": 6.4,
+  "runner": {
+    "cli": "gemini",
+    "arm": "high+gearsecond",
+    "problem": "default",
+    "run": 2,
+    "wall_s": 6.4,
+    "finished_utc": "2026-10-23T20:27:38+00:00"
+  }
+}

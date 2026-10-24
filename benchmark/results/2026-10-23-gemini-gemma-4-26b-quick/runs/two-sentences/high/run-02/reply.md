@@ -1,0 +1,1 @@
+Rust enforces the principle of "aliasing XOR mutation" to ensure that a value cannot be modified while other parts of the program hold references to it. This prevents data races in concurrent code and memory safety issues like iterator invalidation in single-threaded code.

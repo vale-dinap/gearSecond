@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-fyp7i4eljujcfqqmwlaoh",
+  "object": "chat.completion",
+  "created": 1792784933,
+  "model": "openai/gpt-oss-20b",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "When the dependent service went down, every call from this service kept firing five more requests in quick succession.  \n- The downstream API received many duplicate traffic bursts, further stressing it and causing its own throttling or failure responses.  \n- Each retry also waited for a response that never came; the caller\u2019s timeout expired, propagating errors upstream.  \n- The cumulative load made the outage grow instead of shrinking.\n\nA better policy is **exponential back\u2011off with jitter**:  \n\n1. Limit retries to 3\u20134 attempts (or a total timeout of ~5\u202fs).  \n2. Start at ~100\u202fms delay, double each time (200\u202fms, 400\u202fms\u2026).  \n3. Add \u00b110\u202f% random jitter to avoid synchronized bursts.  \n4. Use a per\u2011request timeout (e.g., 1\u202fs) so that hung calls don\u2019t block the retry loop.\n\nThis spreads traffic, gives the downstream service breathing room, and prevents cascading failures.",
+        "reasoning": "We need to answer: Why immediate retries up to 5 times during dependency outage worsened the outage? Likely because each call spawns many requests causing overload or cascading failure; increased load on downstream service makes it more likely to fail; also timeouts and latency increase, leading to timeouts in caller. The retry policy should be exponential backoff with jitter, limited total duration, maybe circuit breaker. Provide explanation and propose new policy: e.g., max 3 retries, exponential backoff starting at 100ms increasing by factor 2 up to 1s, add random jitter \u00b110%. Also use timeout per request.\n\nAnswer concise but thorough.",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1157,
+    "completion_tokens": 344,
+    "total_tokens": 1501,
+    "completion_tokens_details": {
+      "reasoning_tokens": 132
+    }
+  },
+  "stats": {},
+  "system_fingerprint": "openai/gpt-oss-20b",
+  "runner": {
+    "cli": "lmstudio",
+    "arm": "medium+gearsecond",
+    "problem": "default",
+    "run": 5,
+    "wall_s": 16.7,
+    "finished_utc": "2026-10-23T19:49:08+00:00"
+  }
+}

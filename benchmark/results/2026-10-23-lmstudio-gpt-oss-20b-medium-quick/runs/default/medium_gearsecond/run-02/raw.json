@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-285br471tfmkesvhchxfpt",
+  "object": "chat.completion",
+  "created": 1792782038,
+  "model": "openai/gpt-oss-20b",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "When the service retries immediately on every failure it sends a burst of duplicate requests to its dependency while that dependency is already overloaded or partially down.  \n* The burst can push the downstream system over its capacity, turning a mild outage into a full\u2011blown one (the \u201cthundering herd\u201d effect).  \n* Clients keep waiting for each retry to finish before finally getting an error, increasing perceived latency and user frustration.\n\nA safer policy is **exponential backoff with jitter**:\n\n1. Retry up to 5 times (or fewer if the operation is idempotent\u2011safe).  \n2. Wait `delay = base * 2^attempt` milliseconds, e.g., 100\u202fms, 200\u202fms, 400\u202fms\u2026 up to a maximum of ~3\u20135\u202fs.  \n3. Add random jitter (\u00b110\u201320\u202f%) to avoid synchronized retries across many services.  \n\nThis spreads traffic, gives the downstream system time to recover, and still allows quick recovery for transient errors.",
+        "reasoning": "We need to answer: explanation of why immediate retries worsen outage; propose better retry policy.\n\nWe should follow style guidelines: concise, bullet lines? But output is normal reply. We need to keep it short but explanatory. Not too long. No full sentences? The instruction says \"Telegram, not prose.\" That's for internal thinking. For final answer we can use normal text. They didn't specify any format. So final answer should explain.\n\nLet's craft: immediate retries cause request storm, overload dependency, causing cascade; also leads to longer latencies for client due to repeated attempts before error returned; backoff strategy reduces load, spreads requests, gives time to recover; propose exponential backoff with jitter, max delay etc; maybe retry count 3-5 but with delays.\n\nLet's produce final.",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1157,
+    "completion_tokens": 376,
+    "total_tokens": 1533,
+    "completion_tokens_details": {
+      "reasoning_tokens": 158
+    }
+  },
+  "stats": {},
+  "system_fingerprint": "openai/gpt-oss-20b",
+  "runner": {
+    "cli": "lmstudio",
+    "arm": "medium+gearsecond",
+    "problem": "default",
+    "run": 2,
+    "wall_s": 16.9,
+    "finished_utc": "2026-10-23T19:00:53+00:00"
+  }
+}

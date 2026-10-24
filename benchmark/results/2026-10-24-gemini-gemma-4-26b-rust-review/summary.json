@@ -1,0 +1,107 @@
+{
+  "manifest": {
+    "task": "rust-review",
+    "cli": "gemini",
+    "cli_version": "gemini-api-v1beta-openai",
+    "model": "gemma-4-26b-a4b-it",
+    "arms": [
+      "high",
+      "high+gearsecond"
+    ],
+    "runs_per_arm": 8,
+    "problems": {
+      "lib.rs": "4d640c39d60c7a14c55793d093004cb1b9cf168c67e7a3f46f8ef69cd7631fea"
+    },
+    "skills": {
+      "gearsecond": {
+        "sha256": "2390d40b200fa377330a13bb77450fa8d2f66c46580fae80c8419aa8adad0c8f",
+        "file": "skill-gearsecond.md",
+        "source": "plugins/gearsecond/skills/gearsecond/SKILL.md"
+      }
+    },
+    "cli_args": {
+      "high": [
+        "POST",
+        "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "model=gemma-4-26b-a4b-it",
+        "thinking_level=high"
+      ],
+      "high+gearsecond": [
+        "POST",
+        "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "model=gemma-4-26b-a4b-it",
+        "thinking_level=high",
+        "<problem system text, then skill-gearsecond.md, appended to the system prompt>"
+      ]
+    },
+    "isolation": "raw chat-completions API (Gemini API, OpenAI-compatible endpoint), no agent system prompt: the skill (if any) is the only system message",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.2",
+    "runner_sha256": "cc485d26caee75d40ca3e2adf95eca6446f92695314eee300866ad0e3ba10cbf",
+    "bench_sha256": "f4fe2a89e79b6a2c70b7bce1650eaef087b97e187cc214fd0fdf602f9e3b68d1",
+    "note": "Gemini API free tier, thinking_level high in every arm",
+    "started_utc": "2026-10-24T09:30:49+00:00",
+    "finished_utc": "2026-10-24T09:54:19+00:00"
+  },
+  "cells": [
+    {
+      "problem": "lib.rs",
+      "arm": "high",
+      "runs": 8,
+      "failed": 0,
+      "quality": 0.828125,
+      "thinking": [
+        4134,
+        5365,
+        4404,
+        6240,
+        4344,
+        4332,
+        4300,
+        3270
+      ],
+      "cost_total": 0
+    },
+    {
+      "problem": "lib.rs",
+      "arm": "high+gearsecond",
+      "runs": 8,
+      "failed": 0,
+      "quality": 0.8125,
+      "thinking": [
+        4790,
+        4441,
+        3693,
+        0,
+        0,
+        3639,
+        0,
+        0
+      ],
+      "cost_total": 0
+    }
+  ],
+  "comparisons": [
+    {
+      "arm": "high+gearsecond",
+      "baseline": "high",
+      "thinking_change": -0.5448349776031218,
+      "ci95": [
+        -0.8748344184211267,
+        -0.20268452836159379
+      ],
+      "p": 0.0187981201879812,
+      "quality_change": -0.015625
+    }
+  ],
+  "reasoning_style": {
+    "high": {
+      "article_rate": 0.042868833532508574,
+      "words_per_line": 9.359936211031776
+    },
+    "high+gearsecond": {
+      "article_rate": 0.019371061191764443,
+      "words_per_line": 8.492756339406798
+    }
+  }
+}

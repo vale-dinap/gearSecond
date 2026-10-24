@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-idj3bmcglmqt6dk8bx6g7c",
+  "object": "chat.completion",
+  "created": 1792785381,
+  "model": "openai/gpt-oss-20b",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Immediate retries cause the client to hammer the downstream service with many rapid requests.  \nDuring an outage that dependency is already overloaded or unresponsive; each retry adds extra traffic, amplifying the failure and prolonging the outage for everyone.\n\nA better policy uses *exponential back\u2011off with jitter*:\n\n1. **Retry limit** \u2013 keep a small cap (e.g., 5 attempts) to avoid endless loops.  \n2. **Back\u2011off interval** \u2013 double the wait each time: 100\u202fms, 200\u202fms, 400\u202fms, \u2026 up to a maximum (e.g., 3\u202fs).  \n3. **Jitter** \u2013 add random variation (\u00b125\u202f%) so retries from many clients don\u2019t synchronize and spike traffic.  \n4. **Circuit breaker** \u2013 after a configurable number of failures open the circuit for a set period, preventing further requests until health is restored.\n\nThis approach spreads retry traffic over time, gives the downstream service breathing room, and protects both systems during outages.",
+        "reasoning": "We need to answer: explain why immediate retries exacerbated outage; suggest better retry policy.\n\nNeed concise style? The user didn't specify format. We should provide a clear explanation. Use short sentences maybe but not required. Provide reasons: load spiking, cascading failures, backpressure, no time for dependency to recover. Suggest exponential backoff, jitter, max wait, limit concurrency, circuit breaker.\n\nLet's craft answer.",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1157,
+    "completion_tokens": 302,
+    "total_tokens": 1459,
+    "completion_tokens_details": {
+      "reasoning_tokens": 83
+    }
+  },
+  "stats": {},
+  "system_fingerprint": "openai/gpt-oss-20b",
+  "runner": {
+    "cli": "lmstudio",
+    "arm": "medium+gearsecond",
+    "problem": "default",
+    "run": 3,
+    "wall_s": 13.8,
+    "finished_utc": "2026-10-23T19:56:33+00:00"
+  }
+}

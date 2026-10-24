@@ -1,0 +1,1 @@
+Rust’s borrow checker disallows two simultaneous `&mut` references because they would create conflicting aliases that could mutate the same data concurrently, breaking Rust’s guarantee of safe aliasing and preventing undefined behavior at runtime. This rule blocks a class of bugs known as data races and other memory‑safety violations such as double writes or use‑after‑free.

@@ -1,0 +1,1 @@
+Rust enforces exclusive mutable access to prevent concurrent writes that would cause data races and undefined behavior. This eliminates the bug class of data races and memory corruption, guaranteeing memory safety without a garbage collector.

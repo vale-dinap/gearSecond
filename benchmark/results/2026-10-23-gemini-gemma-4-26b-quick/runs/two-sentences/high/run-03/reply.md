@@ -1,0 +1,1 @@
+Rust enforces exclusive access to ensure that no other part of the code can observe or modify a value while it is being mutated. This prevents data races and memory safety issues such as iterator invalidation.

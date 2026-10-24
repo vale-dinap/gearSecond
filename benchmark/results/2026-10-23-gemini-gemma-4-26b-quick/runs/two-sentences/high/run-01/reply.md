@@ -1,0 +1,1 @@
+Rust prohibits multiple mutable references to ensure that mutation is exclusive, preventing any other part of the code from reading or writing to that memory simultaneously. This prevents data races and memory safety bugs, such as iterator invalidation, caused by aliasing and concurrent mutation.

@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-831074gf62m1uyoz9stp75",
+  "object": "chat.completion",
+  "created": 1792783245,
+  "model": "openai/gpt-oss-20b",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Retries immediately up to five times  \nadd traffic when dependency is down  \noverloads downstream queues, causes back\u2011pressure  \nincreases latency for all clients  \nexacerbates outage by stressing shared resources  \n\nUse exponential backoff with jitter  \nstart 100\u202fms, double each retry, max 2\u202fs  \ncap total attempts at three or four  \nadd per\u2011request timeout of 500\u202fms  \nenable circuit breaker after N failures  \nreset after successful call.",
+        "reasoning": "We need explain why immediate retries up to 5 worsen outage: because they add load to already failing system, causing cascading failures, blocking resources, increasing latency, etc. The service is likely to cause backpressure on the dependency; if dependency is down, each retry fails quickly and consumes CPU/network; the client may block waiting for responses; increased traffic leads to more resource exhaustion.\n\nAlso, repeated retries can overwhelm the dependent service's queue or rate limit, causing it to throttle or crash further. It also might cause duplicate work downstream (idempotency issues).\n\nBetter policy: exponential backoff with jitter, capped number of attempts, and possibly circuit breaker. Use moderate delay between retries (e.g., 100ms to start, doubling each time up to some maximum like 2 seconds). Also implement a timeout per request. Add circuit breaker that opens after threshold failures.\n\nExplain.\n\nWe need concise answer; no full sentences. Keep short lines. No filler. Let's produce in bullet or line format? According to style: one fact/inference per line, 4-10 words. So each line is short. Provide explanation and policy.\n\nLet's craft.",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1157,
+    "completion_tokens": 336,
+    "total_tokens": 1493,
+    "completion_tokens_details": {
+      "reasoning_tokens": 231
+    }
+  },
+  "stats": {},
+  "system_fingerprint": "openai/gpt-oss-20b",
+  "runner": {
+    "cli": "lmstudio",
+    "arm": "medium+gearsecond",
+    "problem": "default",
+    "run": 1,
+    "wall_s": 15.7,
+    "finished_utc": "2026-10-23T19:20:59+00:00"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-xfaaa5gi5ebcj6tcfm8ez9",
+  "object": "chat.completion",
+  "created": 1792784525,
+  "model": "openai/gpt-oss-20b",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "ANSWER: 219",
+        "reasoning": "We need count 4-digit numbers (1000-9999) where sum of digits =10. Count solutions to d1+d2+d3+d4=10 with d1 from 1-9, others 0-9. Equivalent to nonnegative integer solutions to x1+x2+x3+x4=10 with x1>=1 <=9, others 0-9.\n\nLet y1 = x1-1 => y1 >=0 <=8. Then y1 + x2 + x3 + x4 =9. All variables nonnegative integers, upper bounds: y1 <=8, x2,x3,x4 <=9. But sum=9, so no variable exceeds 9 anyway except y1 max 8 but could be 9? If y1=9 would exceed bound; need exclude that.\n\nCount all nonnegative solutions to y1+x2+x3+x4=9: C(9+4-1,4-1)=C(12,3)=220. Now subtract those with y1>=9 (i.e., y1=9). If y1=9 then remaining sum 0 => x2=x3=x4=0 gives one solution. So subtract 1 ->219.\n\nAlso need to ensure other digits <=9 but since sum 9, max any is 9, so fine. Also check y1 cannot be >8; we subtracted case y1=9 only. So answer 219.\n\nDouble-check: also consider possibility x2,x3,x4 <=9 satisfied. Good.\n\nThus answer 219.\n\nAnswer line.",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1163,
+    "completion_tokens": 342,
+    "total_tokens": 1505,
+    "completion_tokens_details": {
+      "reasoning_tokens": 328
+    }
+  },
+  "stats": {},
+  "system_fingerprint": "openai/gpt-oss-20b",
+  "runner": {
+    "cli": "lmstudio",
+    "arm": "medium+gearsecond",
+    "problem": "digits4",
+    "run": 2,
+    "wall_s": 15.7,
+    "finished_utc": "2026-10-23T19:42:19+00:00"
+  }
+}

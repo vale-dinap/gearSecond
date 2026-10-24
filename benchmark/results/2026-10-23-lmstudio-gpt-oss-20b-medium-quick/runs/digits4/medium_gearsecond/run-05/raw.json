@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-h9n507ryh5lkijje6ki76b",
+  "object": "chat.completion",
+  "created": 1792784507,
+  "model": "openai/gpt-oss-20b",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Answer: 219",
+        "reasoning": "We need count of 4-digit positive integers (1000-9999) where digit sum =10. Let digits a,b,c,d each 0-9, a\u22651. Sum a+b+c+d=10. Count number of solutions with constraints. Let's compute using stars and bars with restrictions.\n\nLet x=a-1 (since a\u22651). Then x\u22650 \u22648? Actually a max 9 => x\u22648. We have x + b + c + d = 9. All variables nonnegative integers, but also each <=9. But we need ensure none exceed 9. Since total sum 9, no variable can exceed 9 because maximum any is 9 (since sum 9). So upper bound not needed except a: x \u22648? Wait if a=9 then x=8 okay. Sum 9 ensures x\u22649; but x cannot be 9? If x=9 => a=10 impossible. But could x=9? Then other digits zero sum 0; total 9, x=9 -> a=10 >9 invalid. So we need to exclude case x=9. Similarly b,c,d <=9 automatically satisfied.\n\nThus count number of nonnegative integer solutions to x+b+c+d=9 with x\u22648. Count all solutions minus those with x=9.\n\nNumber of unrestricted solutions: C(9+4-1,4-1)=C(12,3)=220.\n\nSubtract solutions where x=9: then b+c+d=0 => only one solution (b=c=d=0). So 219.\n\nThus answer 219. Double-check: But also need ensure a between 1 and 9 inclusive. Our transformation ensures a=x+1. For x from 0 to 8. Count solutions with x=9 invalid removed. Good.\n\nThus final.",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1163,
+    "completion_tokens": 393,
+    "total_tokens": 1556,
+    "completion_tokens_details": {
+      "reasoning_tokens": 379
+    }
+  },
+  "stats": {},
+  "system_fingerprint": "openai/gpt-oss-20b",
+  "runner": {
+    "cli": "lmstudio",
+    "arm": "medium+gearsecond",
+    "problem": "digits4",
+    "run": 5,
+    "wall_s": 18.4,
+    "finished_utc": "2026-10-23T19:42:03+00:00"
+  }
+}

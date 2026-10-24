@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-ec4fya2v0h8eufoqyqcoxn",
+  "object": "chat.completion",
+  "created": 1792782583,
+  "model": "openai/gpt-oss-20b",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "During an outage the downstream service is already overloaded or down.  \nImmediate, back\u2011to\u2011back retries add extra traffic on top of the existing load.  \nEach retry consumes CPU, memory and network bandwidth in both services, so the\nsystem quickly becomes saturated. The added latency from repeated attempts can\nalso cause timeouts that cascade further failures (e.g., downstream queues fill,\nother clients time out). Thus the outage is amplified rather than mitigated.\n\nA better policy:\n\n* **Retry limit** \u2013 keep a small cap (e.g., 3\u20135 attempts) but don\u2019t retry instantly.\n* **Exponential back\u2011off** \u2013 double the wait each attempt: 100\u202fms, 200\u202fms,\n400\u202fms\u2026 up to a maximum delay (\u22482\u20134\u202fs).\n* **Jitter** \u2013 add random variation (\u00b110\u201320\u202f%) to avoid thundering herd.\n* **Circuit breaker** \u2013 after a threshold of consecutive failures open the\ncircuit for a period, then allow a few \u201cprobe\u201d requests.\n\nThis reduces traffic spikes during outages, gives the failing service time to recover,\nand prevents cascading failure.",
+        "reasoning": "Need to answer: why immediate retries worsen outage? Because each call triggers more load on failing service; creates backpressure, propagates failures, may flood downstream, leading to cascading failure. Also can cause increased latency due to repeated attempts.\n\nWhat retry policy? Use exponential backoff with jitter, limit max attempts and total timeout, maybe circuit breaker. So answer: explain why immediate retries amplify outage by increasing traffic load, causing resource exhaustion; also avoid hammering failing dependency. Instead use exponential backoff with random jitter, perhaps a circuit breaker pattern to stop retries after threshold, or degrade gracefully.\n\nWrite concise.",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1157,
+    "completion_tokens": 368,
+    "total_tokens": 1525,
+    "completion_tokens_details": {
+      "reasoning_tokens": 121
+    }
+  },
+  "stats": {},
+  "system_fingerprint": "openai/gpt-oss-20b",
+  "runner": {
+    "cli": "lmstudio",
+    "arm": "medium+gearsecond",
+    "problem": "default",
+    "run": 4,
+    "wall_s": 17.6,
+    "finished_utc": "2026-10-23T19:09:58+00:00"
+  }
+}

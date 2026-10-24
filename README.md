@@ -66,7 +66,7 @@ Same model, same effort level, with and without the skill. Thinking tokens are t
 Four prompts: no style request, "at most two sentences", "exactly 3 numbered points", and a compact style set in the system prompt (no articles, filler or pleasantries). The skill is placed *after* the style request, the position where it would be most likely to override it.
 
 
-| Model                      | No style        | Two sentences   | 3 points        | Compact            |
+| Model                      | Default style   | Two sentences   | 3 points        | Ultra-compact      |
 |----------------------------|-----------------|-----------------|-----------------|--------------------|
 | Claude Opus 5.5 (3 runs)   | 3/3 → 3/3     | 1/3 → 3/3     | 3/3 → 3/3     | 3/3 → 3/3        |
 | Claude Haiku 5.5 (10 runs) | 10/10 → 10/10 | 10/10 → 10/10 | 10/10 → 10/10 | 10/10 → **6/10** |
@@ -74,6 +74,23 @@ Four prompts: no style request, "at most two sentences", "exactly 3 numbered poi
 
 
 Grok CLI's own reply guidelines override styles set in the system prompt, with or without the skill, hence 0/10 in both arms.
+
+### Open models
+
+The quick mix is four exact-answer maths problems, a Python bug hunt and two reply styles.
+
+| Model                         | Task        | Runs per arm | Quality                                | Thinking   | Time          |
+|-------------------------------|-------------|--------------|----------------------------------------|------------|---------------|
+| Gemma 4 26B, thinking on      | Code review | 8            | 6.6/8 → 6.5/8 bugs                     | **−55%** | 115 s → 61 s  |
+| Gemma 4 26B, thinking on      | Quick mix   | 3            | maths, bugs, styles: all kept          | **−77%** |               |
+| Qwen 3.6 35B                  | Code review | 8            | 6.0/8 → 5.4/8 bugs                     | **−25%** | 692 s → 508 s |
+| Qwen 3.6 35B                  | Quick mix   | 5            | maths 20/20, bugs 4/4, styles 10 → 9/10 | **−42%** |               |
+| gpt-oss-20b, medium           | Code review | 20           | 6.2/8 → 5.4/8 bugs                     | **−34%** | 268 s → 170 s |
+| gpt-oss-20b, medium           | Quick mix   | 5            | maths 19/20 → 20/20, bugs 4/4, styles 10 → 9/10 | **−50%** |               |
+
+With the skill on, Gemma often skips thinking altogether, and those runs found as many bugs
+as the rest: the skill seems to help it recognise when a task needs no thinking at all. On the
+smaller models, the code review found slightly fewer bugs.
 
 Every table, the exact prompts and every raw response are in [`benchmark/results`](benchmark/results/README.md), and the whole benchmark reruns with one command. See [`benchmark/README.md`](benchmark/README.md).
 

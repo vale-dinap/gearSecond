@@ -1,0 +1,1 @@
+Rust enforces exclusive mutable access to guarantee that only one part of a program can modify data at a time, preventing undefined behavior from concurrent writes. This rule specifically prevents data races and memory corruption bugs that arise from unsynchronized concurrent modification.

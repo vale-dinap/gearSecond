@@ -1,0 +1,35 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "<thought>- service retries failed HTTP calls immediately\n- max 5 retries\n- dependency outage occurred\n- outcome: outage worsened\n\n- immediate retries + outage = retry storm\n- high request volume hits struggling dependency\n- more resource exhaustion (CPU, connections, memory) on dependency\n- \"thundering herd\" effect\n- dependency can't recover because it's being bombarded\n\n- exponential backoff\n- jitter (randomness)\n- circuit breaker\n- max retry limit (already has one, but needs better timing)\n\n1. Immediate retries cause retry storms.\n2. High volume overwhelms dependency.\n3. Prevents dependency recovery.\n4. Use Exponential Backoff + Jitter.\n5. Use Circuit Breaker.</thought>### Why it made the outage worse\n\nThe service created a **retry storm** (or \"thundering herd\" effect). When the dependency slowed down or failed, the service immediately sent up to five additional requests for every single failed call. \n\nThis caused several compounding issues:\n1.  **Amplified Traffic:** A small increase in failed requests turned into a massive spike in total request volume, potentially multiplying the load by 5x or 6x.\n2.  **Resource Exhaustion:** The dependency, already struggling, was bombarded with a surge of new connections and processing requests, preventing it from recovering.\n3.  **Congestion Collapse:** The increased load likely filled up connection pools, buffers, and CPU cycles on both the service and the dependency, turning a minor hiccup into a total system failure.\n\n---\n\n### Recommended Retry Policy\n\nTo prevent this, you should implement a strategy that spreads out the load and gives the dependency \"breathing room\" to recover.\n\n#### 1. Exponential Backoff\nInstead of retrying immediately, increase the wait time between each attempt (e.g., 100ms, 200ms, 400ms, 800ms). This ensures that as failures persist, the pressure on the dependency decreases.\n\n#### 2. Jitter (Randomness)\nEven with exponential backoff, many clients might retry at the exact same synchronized intervals, creating new spikes of traffic. Adding **jitter** (randomizing the delay slightly) breaks this synchronization and spreads the load evenly over time.\n\n#### 3. Circuit Breaker Pattern\nIf the failure rate exceeds a certain threshold, the \"circuit\" should trip and open. While the circuit is open, the service **stops attempting to call the dependency altogether** for a set period, returning an immediate error to the caller. This provides the dependency with a complete period of rest to recover its resources.\n\n#### Summary of a robust policy:\n*   **Retry Limit:** Keep a reasonable maximum (e.g., 3\u20135).\n*   **Delay:** Exponential backoff + Jitter.\n*   **Safety Valve:** Circuit breaker to halt traffic during sustained outages.",
+        "extra_content": {
+          "google": {
+            "thought": true
+          }
+        },
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1792786003,
+  "id": "Rr7bapSYGKSfkdUP-IbR2Qs",
+  "model": "gemma-4-26b-a4b-it",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 455,
+    "prompt_tokens": 1127,
+    "total_tokens": 1738
+  },
+  "attempt_s": 13.4,
+  "runner": {
+    "cli": "gemini",
+    "arm": "high+gearsecond",
+    "problem": "default",
+    "run": 1,
+    "wall_s": 13.4,
+    "finished_utc": "2026-10-23T20:06:44+00:00"
+  }
+}

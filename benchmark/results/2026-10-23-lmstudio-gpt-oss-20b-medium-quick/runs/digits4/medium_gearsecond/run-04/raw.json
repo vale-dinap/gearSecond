@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-4rpjj7bvww76by0ygbrxfb",
+  "object": "chat.completion",
+  "created": 1792783458,
+  "model": "openai/gpt-oss-20b",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "ANSWER: 219",
+        "reasoning": "We need count of 4-digit numbers (1000-9999) whose digit sum is 10. Digits d1,d2,d3,d4, each 0-9, d1>=1. Sum=10. Count solutions to d1+d2+d3+d4=10 with d1\u22651, di\u22649.\n\nLet x1=d1-1 \u22650; then x1+x2+x3+x4 = 9, where xi\u2208[0,9] and for i>1 also \u22649.\n\nWe need number of nonnegative integer solutions to sum=9 with each <=9. But since total is 9, no variable exceeds 9 anyway. So simply number of compositions into 4 parts: C(9+4-1,4-1)=C(12,3)=220. Wait check constraints: x1 can be up to 8? Actually d1\u22649 => x1\u22648. But sum=9; x1 could be 9? That would require other xi zero. If x1=9, then d1=10 which invalid. So we must exclude x1=9. Similarly any variable cannot exceed 9 but that's okay except x1. Since total 9, only x1 can equal 9 (others zero). So subtract 1 solution where x1=9.\n\nThus answer =220-1=219. Check: also d1 cannot be 0 so x1\u22650; fine. Are there any other invalid due to digit >9? For i>1, max is 9 but sum 9 ensures none exceed 9. So final count 219.\n\nAnswer line.",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1163,
+    "completion_tokens": 359,
+    "total_tokens": 1522,
+    "completion_tokens_details": {
+      "reasoning_tokens": 344
+    }
+  },
+  "stats": {},
+  "system_fingerprint": "openai/gpt-oss-20b",
+  "runner": {
+    "cli": "lmstudio",
+    "arm": "medium+gearsecond",
+    "problem": "digits4",
+    "run": 4,
+    "wall_s": 16.4,
+    "finished_utc": "2026-10-23T19:24:33+00:00"
+  }
+}

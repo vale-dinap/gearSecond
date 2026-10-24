@@ -1,0 +1,1 @@
+Rust forbids two simultaneous `&mut` references to the same value because its aliasing rules guarantee that only one mutable reference can exist at a time, ensuring exclusive write access. This prevents data‑race bugs and undefined behavior that could arise from concurrent or overlapping mutable mutations.

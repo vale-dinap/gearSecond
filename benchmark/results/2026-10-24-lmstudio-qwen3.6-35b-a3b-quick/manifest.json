@@ -1,0 +1,49 @@
+{
+  "task": "quick",
+  "cli": "lmstudio",
+  "cli_version": "lms-commit-dcefd5a",
+  "model": "qwen/qwen3.6-35b-a3b",
+  "arms": [
+    "default",
+    "default+gearsecond"
+  ],
+  "runs_per_arm": 5,
+  "problems": {
+    "orders.py": "8ab01e90bff86be7ef232535a0d5ed4e778f0be641bba943d8f93a172e8d35e6",
+    "stairs": "4508659ee6187ddade281be8f465056c5987e5ad5ddedfc08f1a46ba5e89ce75",
+    "derange": "97564f1995ae2fd89b8cc04472fecf9299d74b3023668d9a622a06db56ab116e",
+    "div35": "254927836db55f1d566cbe9522dc8b1e02be6a2e4f10eb33a4d236ed0233e24f",
+    "digits4": "3909dc859ecde700e6bcd8b00b8fea0c90fea4f51222d3aeb37ab81ab2acd2aa",
+    "default": "d0035da801a0b6af7929857639ce2cc7304383154ebf91ca217ce5d1e500ad7d",
+    "two-sentences": "f32555faf7d7100d616ed7c8f965c06b94f6c53615a49ff9bf9f87ceeca69e6b"
+  },
+  "skills": {
+    "gearsecond": {
+      "sha256": "2390d40b200fa377330a13bb77450fa8d2f66c46580fae80c8419aa8adad0c8f",
+      "file": "skill-gearsecond.md",
+      "source": "plugins/gearsecond/skills/gearsecond/SKILL.md"
+    }
+  },
+  "cli_args": {
+    "default": [
+      "POST",
+      "http://localhost:2345/v1/chat/completions",
+      "model=qwen/qwen3.6-35b-a3b"
+    ],
+    "default+gearsecond": [
+      "POST",
+      "http://localhost:2345/v1/chat/completions",
+      "model=qwen/qwen3.6-35b-a3b",
+      "<problem system text, then skill-gearsecond.md, appended to the system prompt>"
+    ]
+  },
+  "isolation": "raw chat-completions API, no agent system prompt: the skill (if any) is the only system message; model settings (sampling, context, reasoning budget) from LM Studio",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.2",
+  "runner_sha256": "cc485d26caee75d40ca3e2adf95eca6446f92695314eee300866ad0e3ba10cbf",
+  "bench_sha256": "f4fe2a89e79b6a2c70b7bce1650eaef087b97e187cc214fd0fdf602f9e3b68d1",
+  "reasoning_budget": 8192,
+  "note": "context 65536, Enable thinking on, reasoning budget 8192 with message '... wait, that's enough. I have to answer now.', LM Studio default sampling",
+  "started_utc": "2026-10-24T00:33:00+00:00",
+  "finished_utc": "2026-10-24T07:22:03+00:00"
+}

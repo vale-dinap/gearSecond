@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-b2vvctus34mp4ow9smlhwa",
+  "object": "chat.completion",
+  "created": 1792782526,
+  "model": "openai/gpt-oss-20b",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "**Why the \u201cimmediate\u2011retries\u2011up\u2011to\u20115\u201d strategy made the outage worse**\n\n| What the code did | What actually happened in the system |\n|-------------------|--------------------------------------|\n| On every HTTP 5xx or timeout, the client **sent a new request right away** (no delay). | The downstream service was already down or heavily throttled. The flood of new requests hit it *again* immediately after the first failure. |\n| Up to five attempts were made per call, all back\u2011to\u2011back. | Each attempt added load on the dependency \u2013 more CPU, memory, and network usage. In a cascading\u2011failure scenario this is called a **retry storm** or \u201cthundering herd\u201d. |\n| The retry logic didn\u2019t take into account the health of the downstream service. | As the downstream service struggled to keep up with the sudden surge, its response times grew, more timeouts occurred, and more retries were triggered \u2013 a vicious feedback loop that amplified the outage. |\n\nIn short: **\u201cfire\u2011and\u2011forget\u201d retries are a classic recipe for turning a single failure into a system\u2011wide spike in load and latency.**\n\n---\n\n## A better retry policy\n\nThe goal is to be *aggressive enough* to recover from transient glitches, but *gentle enough* not to push a failing dependency harder.\n\n### 1. Exponential back\u2011off with jitter\nInstead of sending the next request immediately, wait an increasing amount of time that also contains random variation (jitter). This spreads retries over time and avoids synchronised bursts.\n\n| Retry # | Base delay (ms) | Jitter factor | Final interval (\u2248) |\n|---------|-----------------|---------------|--------------------|\n| 1       | 50              | \u00b120\u202f%         | 40\u201360 ms           |\n| 2       | 100             | \u00b120\u202f%         | 80\u2013120 ms          |\n| 3       | 200             | \u00b120\u202f%         | 160\u2013240 ms         |\n| 4       | 400             | \u00b120\u202f%         | 320\u2013480 ms         |\n| 5       | 800             | \u00b120\u202f%         | 640\u2013960 ms         |\n\n*The exact numbers can be tuned to the latency profile of your system.*\n\n### 2. Total retry budget\nStop after a *maximum elapsed time*, e.g., **2\u202fseconds** or **3 attempts** \u2013 whichever comes first. This caps the total time spent on a single operation and keeps the caller responsive.\n\n### 3. Circuit breaker (optional but recommended)\nIf you observe more than, say, **30\u202f% failures in the last minute**, open the circuit: immediately fail new calls without even trying to reach the downstream service. After a cooldown period (e.g., 10\u202fseconds), allow a single \u201cprobe\u201d request; if it succeeds, close the circuit.\n\n### 4. Idempotency check\nRetry only for idempotent HTTP verbs (`GET`, `HEAD`, `PUT`, `DELETE` with no side\u2011effects). For non\u2011idempotent verbs (`POST`) either avoid retries or use a safe \u201cretry\u2011safe\u201d pattern (e.g., client\u2011side generated idempotency keys).\n\n### 5. Backpressure / throttling\nIf the service is already saturated, throttle outgoing requests: drop or queue them instead of immediately retrying. A simple token bucket can keep the rate below a chosen threshold.\n\n---\n\n## Putting it together \u2013 a sample policy in pseudo\u2011code\n\n```python\nMAX_TOTAL_TIME = 2_000            # ms\nRETRY_LIMIT   = 5\nBASE_DELAY    = 50                # ms\nJITTER        = 0.20              # \u00b120%\n\ndef call_dependency():\n    start_time = now()\n    attempt = 0\n    while True:\n        try:\n            return http_get(url, timeout=500)   # 500\u202fms request timeout\n        except TransientError:                  # 5xx, network failure, etc.\n            elapsed = now() - start_time\n            if elapsed > MAX_TOTAL_TIME or attempt >= RETRY_LIMIT:\n                raise\n\n            delay = BASE_DELAY * (2 ** attempt)\n            delay *= random.uniform(1-JITTER, 1+JITTER)\n\n            sleep(delay)\n            attempt += 1\n```\n\n*Add a circuit\u2011breaker wrapper around `call_dependency()` that monitors failure rate and short\u2011circuits the call if thresholds are exceeded.*\n\n---\n\n### Bottom line\n\n- **Immediate retries** create *retry storms* that overload a failing dependency.\n- Use **exponential back\u2011off + jitter**, a **total retry budget**, and optionally a **circuit breaker** to keep retries useful without hurting system health. This gives your service resilience while protecting its downstream partners during outages.",
+        "reasoning": "The question: \"A service retries failed HTTP calls immediately, up to 5 times. During an outage of its dependency, that made the outage worse. Explain why, and what retry policy you would use instead.\"\n\nWe need to explain why immediate retries cause more load on a failing downstream service (dependency) during outage, leading to cascading failures or amplified outages. The issue: the dependent service is overloaded by repeated requests from the client. That increases response times, timeouts, etc., exacerbating outage. Also, retry logic can create backpressure and lead to queueing and resource exhaustion.\n\nExplain the concept of \"retry storm\" or \"circuit breaker.\" Immediate retries cause a flood of traffic. The solution: exponential backoff with jitter, limit number of retries, maybe use circuit breaker pattern. Provide an example policy: first retry after 100 ms, second after 200 ms, third after 400 ms, etc., up to some maximum interval and total time. Also implement a \"circuit breaker\" that trips if failure rate high.\n\nAlso mention that you can use a timeout for each request, so the service doesn't block for too long. Use concurrency limiting, or fallback responses.\n\nThus answer: explain why immediate retries cause more traffic, saturate downstream, increase latency, and degrade system; propose using exponential backoff with jitter, maybe limit total time to e.g., 2 seconds, or use a circuit breaker that stops sending requests after some threshold. Also mention \"retry on idempotent HTTP methods only.\" Provide a concrete policy: first retry after 100ms, then 200ms, then 400ms, then 800ms, then 1600ms, with jitter \u00b120% and stop after e.g., 5 seconds or 10 retries.\n\nAlso can mention that the service should use a \"retry policy\" like \"Retry up to N times with exponential backoff and random jitter, but also implement a circuit breaker to avoid retry storms.\"\n\nLet's craft an answer. Provide explanation and recommended policy. Use examples.",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 106,
+    "completion_tokens": 1420,
+    "total_tokens": 1526,
+    "completion_tokens_details": {
+      "reasoning_tokens": 411
+    }
+  },
+  "stats": {},
+  "system_fingerprint": "openai/gpt-oss-20b",
+  "runner": {
+    "cli": "lmstudio",
+    "arm": "medium",
+    "problem": "default",
+    "run": 4,
+    "wall_s": 57.0,
+    "finished_utc": "2026-10-23T19:09:40+00:00"
+  }
+}

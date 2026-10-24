@@ -1,0 +1,1 @@
+Because allowing two simultaneous mutable references would give you two distinct aliases that can both change the same memory without coordination, breaking Rust’s guarantee of unique mutability and leading to undefined behaviour such as data races; this rule blocks the class of bugs known as **mutable‑aliasing** (unsound concurrent mutation).

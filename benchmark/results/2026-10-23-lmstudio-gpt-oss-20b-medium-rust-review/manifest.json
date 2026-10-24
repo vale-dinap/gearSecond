@@ -1,0 +1,44 @@
+{
+  "task": "rust-review",
+  "cli": "lmstudio",
+  "cli_version": "lms-commit-dcefd5a",
+  "model": "openai/gpt-oss-20b",
+  "arms": [
+    "medium",
+    "medium+gearsecond"
+  ],
+  "runs_per_arm": 20,
+  "problems": {
+    "lib.rs": "4d640c39d60c7a14c55793d093004cb1b9cf168c67e7a3f46f8ef69cd7631fea"
+  },
+  "skills": {
+    "gearsecond": {
+      "sha256": "2390d40b200fa377330a13bb77450fa8d2f66c46580fae80c8419aa8adad0c8f",
+      "file": "skill-gearsecond.md",
+      "source": "plugins/gearsecond/skills/gearsecond/SKILL.md"
+    }
+  },
+  "cli_args": {
+    "medium": [
+      "POST",
+      "http://localhost:2345/v1/chat/completions",
+      "model=openai/gpt-oss-20b",
+      "reasoning_effort=medium"
+    ],
+    "medium+gearsecond": [
+      "POST",
+      "http://localhost:2345/v1/chat/completions",
+      "model=openai/gpt-oss-20b",
+      "reasoning_effort=medium",
+      "<problem system text, then skill-gearsecond.md, appended to the system prompt>"
+    ]
+  },
+  "isolation": "raw chat-completions API, no agent system prompt: the skill (if any) is the only system message; model settings (sampling, context, reasoning budget) from LM Studio",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.2",
+  "runner_sha256": "cc485d26caee75d40ca3e2adf95eca6446f92695314eee300866ad0e3ba10cbf",
+  "bench_sha256": "f4fe2a89e79b6a2c70b7bce1650eaef087b97e187cc214fd0fdf602f9e3b68d1",
+  "note": "context 65k, reasoning_effort medium (sent per request), no reasoning budget, LM Studio default sampling",
+  "started_utc": "2026-10-23T19:59:22+00:00",
+  "finished_utc": "2026-10-24T00:32:50+00:00"
+}

@@ -1,0 +1,1 @@
+Rust enforces this rule to guarantee memory safety by preventing concurrent writes to the same memory location, which would otherwise cause data races. This eliminates the bug class of data races (and associated undefined behavior) at compile time.

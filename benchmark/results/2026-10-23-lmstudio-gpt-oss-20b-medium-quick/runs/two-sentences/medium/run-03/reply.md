@@ -1,0 +1,1 @@
+Rust’s borrow checker forbids two simultaneous mutable references because it would allow multiple writers to the same location, breaking Rust’s guarantee of exclusive access and enabling undefined behaviour such as data races. This rule prevents bugs in the class of unsafe memory aliasing (mutable aliasing) that could corrupt state or cause race conditions.

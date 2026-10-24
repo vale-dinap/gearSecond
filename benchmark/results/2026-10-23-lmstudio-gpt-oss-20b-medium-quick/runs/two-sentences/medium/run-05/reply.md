@@ -1,0 +1,1 @@
+Rust rejects two simultaneous mutable references because they would give aliased mutation—an unsafe way to corrupt shared state or create data races—and the borrow checker enforces exclusive ownership to prevent this class of bugs (undefined behaviour from concurrent/mutually‑aliased writes).

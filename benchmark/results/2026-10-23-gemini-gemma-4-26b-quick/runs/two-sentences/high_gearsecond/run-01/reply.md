@@ -1,0 +1,1 @@
+Rust enforces this rule to prevent data races, which occur when multiple pointers access the same memory location simultaneously with at least one being a write. By allowing only one mutable reference at a time, the compiler ensures memory safety and prevents unpredictable behavior caused by aliasing.

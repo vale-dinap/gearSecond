@@ -1,0 +1,1 @@
+Rust enforces this rule to guarantee memory safety by ensuring exclusive access, which prevents concurrent modifications that could corrupt data or leave it in an inconsistent state. This eliminates the bug class known as data races.

@@ -1,0 +1,1 @@
+Rust prevents multiple mutable references to the same value to ensure exclusive access to data, thereby enforcing the borrow checker's ownership rules. This restriction prevents data races, where multiple pointers could access and modify the same memory location simultaneously, leading to undefined behavior.
