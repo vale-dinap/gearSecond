@@ -88,14 +88,15 @@ The quick mix is four exact-answer maths problems, a Python bug hunt and two rep
 |-------------------------------|-------------|--------------|----------------------------------------|------------|---------------|
 | Gemma 4 26B-A4B, thinking on  | Code review | 8            | 6.6/8 → 6.5/8 bugs                     | **−55%** | 115 s → 61 s  |
 | Gemma 4 26B-A4B, thinking on  | Quick mix   | 3            | maths, bugs, styles: all kept          | **−77%** |               |
-| Qwen3.6 35B-A3B               | Code review | 8            | 6.0/8 → 5.4/8 bugs                     | **−25%** | 692 s → 508 s |
+| Qwen3.6 35B-A3B               | Code review | 8 / 16       | 6.0/8 → 5.8/8 bugs                     | **−19%** | 692 s → 511 s |
 | Qwen3.6 35B-A3B               | Quick mix   | 5            | maths 20/20, bugs 4/4, styles 10 → 9/10 | **−42%** |               |
 | gpt-oss 20B, medium           | Code review | 20           | 6.2/8 → 5.4/8 bugs                     | **−34%** | 268 s → 170 s |
 | gpt-oss 20B, medium           | Quick mix   | 5            | maths 19/20 → 20/20, bugs 4/4, styles 10 → 9/10 | **−50%** |               |
 
 With the skill on, Gemma often skips thinking altogether, and those runs found as many bugs
 as the rest: the skill seems to help it recognise when a task needs no thinking at all. On the
-smaller models, the code review found on average under one bug fewer out of eight.
+smaller models, the code review found on average under one bug fewer out of eight. Qwen's
+code review ran 8 times without the skill and 16 with it.
 
 Every table, the exact prompts and every raw response are in [`benchmark/results`](benchmark/results/README.md), and the whole benchmark reruns with one command. See [`benchmark/README.md`](benchmark/README.md).
 

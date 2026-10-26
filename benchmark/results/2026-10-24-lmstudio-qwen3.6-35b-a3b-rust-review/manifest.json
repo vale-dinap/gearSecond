@@ -7,7 +7,7 @@
     "default",
     "default+gearsecond"
   ],
-  "runs_per_arm": 8,
+  "runs_per_arm": "8 (no skill), 16 (skill arms)",
   "problems": {
     "lib.rs": "4d640c39d60c7a14c55793d093004cb1b9cf168c67e7a3f46f8ef69cd7631fea"
   },
@@ -34,5 +34,5 @@
   "reasoning_budget": 8192,
   "note": "context 65536, Enable thinking on, reasoning budget 8192 with message '... wait, that's enough. I have to answer now.', LM Studio default sampling",
   "started_utc": "2026-10-24T07:22:06+00:00",
-  "finished_utc": "2026-10-24T12:33:33+00:00"
+  "finished_utc": "2026-10-24T15:57:01+00:00"
 }
